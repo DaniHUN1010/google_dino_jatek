@@ -2,7 +2,7 @@ import pygame
 import random
 import time
 
-# Pygame inicializálása
+# Pygame inicializálása 
 pygame.init()
 
 # Ablak mérete
