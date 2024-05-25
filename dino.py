@@ -24,16 +24,22 @@ class FPS:
 
 fps = FPS()
 
-# Négyzet adatai
-rect_width, rect_height = 50, 50
+# Karakter adatai
+rect_width, rect_height = 80, 80  # Sprite méret
 rect_x, rect_y = width // 2, height - rect_height
-rect_color = (150, 0, 150)  # Szín
 rect_speed = 5  # Vízszintes sebesség
+
+# Karakter képek betöltése és méretezése
+character_right = pygame.image.load("sprite_right.png").convert_alpha()
+character_left = pygame.image.load("sprite_left.png").convert_alpha()
+character_right = pygame.transform.scale(character_right, (rect_width, rect_height))
+character_left = pygame.transform.scale(character_left, (rect_width, rect_height))
+current_character = character_right  # Kezdő nézet
 
 # Ugrás változók
 is_jumping = False
 is_falling = False
-jump_height = rect_height * 3
+jump_height = rect_height * 2#Ugrási magasság
 jump_speed = rect_speed * 2  # Ugrási sebesség növelése a gyors felugráshoz
 fall_speed = jump_speed * 2  # Duplázott ugrási sebesség a gyors eséshez
 initial_y = rect_y
@@ -57,8 +63,10 @@ while running:
     keys = pygame.key.get_pressed()
     if keys[pygame.K_LEFT]:
         rect_x -= rect_speed
+        current_character = character_left
     if keys[pygame.K_RIGHT]:
         rect_x += rect_speed
+        current_character = character_right
     if (keys[pygame.K_SPACE] or keys[pygame.K_UP]) and not is_jumping and not is_falling:
         is_jumping = True
     if not (keys[pygame.K_SPACE] or keys[pygame.K_UP]) and is_jumping:
@@ -90,8 +98,8 @@ while running:
     # FPS kirajzolása
     fps.render(temp_surface)
 
-    # Négyzet kirajzolása
-    pygame.draw.rect(temp_surface, rect_color, pygame.Rect(rect_x, rect_y, rect_width, rect_height))
+    # Karakter kirajzolása
+    temp_surface.blit(current_character, (rect_x, rect_y))
 
     # Időszámláló kirajzolása
     elapsed_time = int(time.time() - start_time)
