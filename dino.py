@@ -39,9 +39,9 @@ current_character = character_right  # Kezdő nézet
 # Ugrás változók
 is_jumping = False
 is_falling = False
-jump_height = rect_height * 2 #Ugrási magasság
+jump_height = rect_height * 2 # Ugrási magasság
 jump_speed = rect_speed * 2  # Ugrási sebesség növelése a gyors felugráshoz
-fall_speed = jump_speed * 2  # Duplázott ugrási sebesség a gyors eséshez
+fall_speed = jump_speed * 1  # Esési sebesség
 initial_y = rect_y
 max_jump_height = initial_y - jump_height
 
