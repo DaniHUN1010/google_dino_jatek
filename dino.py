@@ -30,8 +30,8 @@ rect_x, rect_y = width // 2, height - rect_height
 rect_speed = 5  # Vízszintes sebesség
 
 # Karakter képek betöltése és méretezése
-character_right = pygame.image.load("sprite_right.png").convert_alpha()
-character_left = pygame.image.load("sprite_left.png").convert_alpha()
+character_right = pygame.image.load("sprite_right_fixed.png").convert_alpha()
+character_left = pygame.image.load("sprite_left_fixed.png").convert_alpha()
 character_right = pygame.transform.scale(character_right, (rect_width, rect_height))
 character_left = pygame.transform.scale(character_left, (rect_width, rect_height))
 current_character = character_right  # Kezdő nézet
@@ -39,7 +39,7 @@ current_character = character_right  # Kezdő nézet
 # Ugrás változók
 is_jumping = False
 is_falling = False
-jump_height = rect_height * 2#Ugrási magasság
+jump_height = rect_height * 2 #Ugrási magasság
 jump_speed = rect_speed * 2  # Ugrási sebesség növelése a gyors felugráshoz
 fall_speed = jump_speed * 2  # Duplázott ugrási sebesség a gyors eséshez
 initial_y = rect_y
