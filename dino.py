@@ -5,6 +5,7 @@ import time
 # Pygame inicializálása
 pygame.init()
 pygame.font.init()
+pygame.mixer.init()
 
 # Ablak mérete
 width, height = 800, 600
@@ -53,6 +54,12 @@ start_time = time.time()
 # Betűtípus
 font = pygame.font.Font(None, 36)
 
+# Játék kezdőképernyője
+show_start_message = True
+
+# Zene betöltése
+start_sound = pygame.mixer.Sound("start.mp3")
+
 # Fő játékciklus
 running = True
 
@@ -61,57 +68,69 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
-    # Billentyűzet bemenetek kezelése
-    keys = pygame.key.get_pressed()
-    if keys[pygame.K_LEFT]:
-        bg_x += rect_speed
-        current_character = character_left
-    if keys[pygame.K_RIGHT]:
-        bg_x -= rect_speed
-        current_character = character_right
-    if (keys[pygame.K_SPACE] or keys[pygame.K_UP]) and not is_jumping and not is_falling:
-        is_jumping = True
-    if not (keys[pygame.K_SPACE] or keys[pygame.K_UP]) and is_jumping:
-        is_jumping = False
-        is_falling = True
-
-    # Háttér mozgatása és ismétlése
-    bg_x = bg_x % width  # A háttérkép folyamatos ismétlődésének biztosítása
-    screen.blit(BG, (bg_x - width, 0))  # Háttérkép bal oldalon
-    screen.blit(BG, (bg_x, 0))  # Háttérkép középen
-    screen.blit(BG, (bg_x + width, 0))  # Háttérkép jobb oldalon
-
-    # Ugrás kezelése
-    if is_jumping:
-        rect_y -= jump_speed
-        if rect_y <= max_jump_height:
-            rect_y = max_jump_height
+    if show_start_message:
+        screen.fill((0, 0, 0))
+        start_text = font.render("A játék indításához nyomd le a spacet!", True, (255, 255, 255))
+        screen.blit(start_text, (width // 2 - start_text.get_width() // 2, height // 2 - start_text.get_height() // 2))
+        pygame.display.update()
+        
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_SPACE]:
+            show_start_message = False
+            start_sound.play()
+            start_time = time.time()  # Az időszámláló újraindítása
+    else:
+        # Billentyűzet bemenetek kezelése
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_LEFT]:
+            bg_x += rect_speed
+            current_character = character_left
+        if keys[pygame.K_RIGHT]:
+            bg_x -= rect_speed
+            current_character = character_right
+        if (keys[pygame.K_SPACE] or keys[pygame.K_UP]) and not is_jumping and not is_falling:
+            is_jumping = True
+        if not (keys[pygame.K_SPACE] or keys[pygame.K_UP]) and is_jumping:
             is_jumping = False
             is_falling = True
 
-    # Esés kezelése
-    if is_falling:
-        rect_y += fall_speed
-        if rect_y >= initial_y:
-            rect_y = initial_y
-            is_falling = False
+        # Háttér mozgatása és ismétlése
+        bg_x = bg_x % width  # A háttérkép folyamatos ismétlődésének biztosítása
+        screen.blit(BG, (bg_x - width, 0))  # Háttérkép bal oldalon
+        screen.blit(BG, (bg_x, 0))  # Háttérkép középen
+        screen.blit(BG, (bg_x + width, 0))  # Háttérkép jobb oldalon
 
-    # Karakter kirajzolása
-    screen.blit(current_character, (rect_x, rect_y))
+        # Ugrás kezelése
+        if is_jumping:
+            rect_y -= jump_speed
+            if rect_y <= max_jump_height:
+                rect_y = max_jump_height
+                is_jumping = False
+                is_falling = True
 
-    # FPS kirajzolása
-    fps.render(screen)
+        # Esés kezelése
+        if is_falling:
+            rect_y += fall_speed
+            if rect_y >= initial_y:
+                rect_y = initial_y
+                is_falling = False
 
-    # Időszámláló kirajzolása
-    elapsed_time = int(time.time() - start_time)
-    time_text = font.render(f"Idő: {elapsed_time}", True, (255, 255, 255))
-    screen.blit(time_text, (10, 10))
+        # Karakter kirajzolása
+        screen.blit(current_character, (rect_x, rect_y))
 
-    # Képernyő frissítése
-    pygame.display.update()
+        # FPS kirajzolása
+        fps.render(screen)
 
-    # FPS szabályozása
-    fps.clock.tick(75)
+        # Időszámláló kirajzolása
+        elapsed_time = int(time.time() - start_time)
+        time_text = font.render(f"Idő: {elapsed_time}", True, (255, 255, 255))
+        screen.blit(time_text, (10, 10))
+
+        # Képernyő frissítése
+        pygame.display.update()
+
+        # FPS szabályozása
+        fps.clock.tick(75)
 
 # Pygame leállítása
 pygame.quit()
