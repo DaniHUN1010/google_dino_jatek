@@ -60,8 +60,8 @@ show_start_message = True
 # Zene betöltése
 start_sound = pygame.mixer.Sound("start.mp3")
 elso_track = pygame.mixer.Sound("elso_track.wav")
-masodik_track = pygame.mixer.Sound("masodik_track.mp3")
-harmadik_track = pygame.mixer.Sound("harmadik_track.wav")
+masodik_track = pygame.mixer.Sound("masodik_track.wav")
+harmadik_track = pygame.mixer.Sound("harmadik_track.mp3")
 
 # Ready és Go képek betöltése
 ready_image = pygame.image.load("ready.png").convert_alpha()
@@ -115,7 +115,6 @@ while running:
     else:
         if next_track_time and time.time() >= next_track_time:
             play_next_track()
-            next_track_time = None
 
         # Billentyűzet bemenetek kezelése
         keys = pygame.key.get_pressed()
