@@ -59,6 +59,15 @@ show_start_message = True
 
 # Zene betöltése
 start_sound = pygame.mixer.Sound("start.mp3")
+elso_track = pygame.mixer.Sound("elso_track.wav")
+
+# Ready és Go képek betöltése
+ready_image = pygame.image.load("ready.png").convert_alpha()
+go_image = pygame.image.load("go2.png").convert_alpha()
+
+# Változó az "elso_track" hang késleltetett lejátszásához
+play_track_delay = 1  # Másodperc
+track_play_time = None
 
 # Fő játékciklus
 running = True
@@ -78,8 +87,26 @@ while running:
         if keys[pygame.K_SPACE]:
             show_start_message = False
             start_sound.play()
+            # Ready kép megjelenítése
+            screen.fill((0, 0, 0))
+            screen.blit(ready_image, (width // 2 - ready_image.get_width() // 2, height // 2 - ready_image.get_height() // 2))
+            pygame.display.update()
+            time.sleep(1)  # 1 másodperc várakozás
+            
+            # Go kép megjelenítése
+            screen.fill((0, 0, 0))
+            screen.blit(go_image, (width // 2 - go_image.get_width() // 2, height // 2 - go_image.get_height() // 2))
+            pygame.display.update()
+            time.sleep(1)  # 1 másodperc várakozás
+            
             start_time = time.time()  # Az időszámláló újraindítása
+            track_play_time = start_time + play_track_delay  # Beállítja az időpontot, amikor elindul a zene
     else:
+        # Ellenőrzi, hogy eljött-e az idő az "elso_track" lejátszásához
+        if track_play_time and time.time() >= track_play_time:
+            elso_track.play()
+            track_play_time = None  # Biztosítsa, hogy csak egyszer játssza le
+
         # Billentyűzet bemenetek kezelése
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT]:
