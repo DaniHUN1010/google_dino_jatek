@@ -56,6 +56,8 @@ font = pygame.font.Font(None, 36)
 
 # Játék kezdőképernyője
 show_start_message = True
+show_easy_message = False
+show_cancel_button = False
 
 # Zene betöltése
 start_sound = pygame.mixer.Sound("start.mp3")
@@ -80,6 +82,33 @@ def play_next_track():
         next_track_time = time.time() + tracks[current_track_index].get_length() + play_track_delay
         current_track_index += 1
 
+def start_game():
+    global start_time
+    start_time = time.time()
+    play_next_track()
+
+def show_ready_go():
+    screen.fill((0, 0, 0))
+    screen.blit(ready_image, (width // 2 - ready_image.get_width() // 2, height // 2 - ready_image.get_height() // 2))
+    pygame.display.update()
+    time.sleep(1)  # 1 másodperc várakozás
+
+    screen.fill((0, 0, 0))
+    screen.blit(go_image, (width // 2 - go_image.get_width() // 2, height // 2 - go_image.get_height() // 2))
+    pygame.display.update()
+    time.sleep(1)  # 1 másodperc várakozás
+
+# Tégla méretek és pozíciók a nehézségi fokokhoz
+button_width, button_height = 200, 50
+easy_button_rect = pygame.Rect(width // 2 - button_width // 2, height // 2 - 100, button_width, button_height)
+medium_button_rect = pygame.Rect(width // 2 - button_width // 2, height // 2, button_width, button_height)
+hard_button_rect = pygame.Rect(width // 2 - button_width // 2, height // 2 + 100, button_width, button_height)
+cancel_button_rect = pygame.Rect(10, height - 60, 100, 50)
+
+# Színek
+button_color = (70, 130, 180)
+text_color = (255, 255, 255)
+
 # Fő játékciklus
 running = True
 
@@ -87,31 +116,52 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            mouse_pos = pygame.mouse.get_pos()
+            if show_start_message:
+                if easy_button_rect.collidepoint(mouse_pos):
+                    show_start_message = False
+                    show_easy_message = True
+                    show_cancel_button = True
+                elif medium_button_rect.collidepoint(mouse_pos) or hard_button_rect.collidepoint(mouse_pos):
+                    show_start_message = False
+                    start_sound.play()
+                    show_ready_go()
+                    start_game()
+            elif show_easy_message and show_cancel_button:
+                if cancel_button_rect.collidepoint(mouse_pos):
+                    show_easy_message = False
+                    show_start_message = True
+                    show_cancel_button = False
 
     if show_start_message:
         screen.fill((0, 0, 0))
-        start_text = font.render("A játék indításához nyomd le a spacet!", True, (255, 255, 255))
-        screen.blit(start_text, (width // 2 - start_text.get_width() // 2, height // 2 - start_text.get_height() // 2))
+        pygame.draw.rect(screen, button_color, easy_button_rect)
+        pygame.draw.rect(screen, button_color, medium_button_rect)
+        pygame.draw.rect(screen, button_color, hard_button_rect)
+
+        easy_text = font.render("Könnyű", True, text_color)
+        medium_text = font.render("Közepes", True, text_color)
+        hard_text = font.render("Nehéz", True, text_color)
+
+        screen.blit(easy_text, (easy_button_rect.centerx - easy_text.get_width() // 2, easy_button_rect.centery - easy_text.get_height() // 2))
+        screen.blit(medium_text, (medium_button_rect.centerx - medium_text.get_width() // 2, medium_button_rect.centery - medium_text.get_height() // 2))
+        screen.blit(hard_text, (hard_button_rect.centerx - hard_text.get_width() // 2, hard_button_rect.centery - hard_text.get_height() // 2))
+
         pygame.display.update()
-        
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_SPACE]:
-            show_start_message = False
-            start_sound.play()
-            # Ready kép megjelenítése
-            screen.fill((0, 0, 0))
-            screen.blit(ready_image, (width // 2 - ready_image.get_width() // 2, height // 2 - ready_image.get_height() // 2))
-            pygame.display.update()
-            time.sleep(1)  # 1 másodperc várakozás
-            
-            # Go kép megjelenítése
-            screen.fill((0, 0, 0))
-            screen.blit(go_image, (width // 2 - go_image.get_width() // 2, height // 2 - go_image.get_height() // 2))
-            pygame.display.update()
-            time.sleep(1)  # 1 másodperc várakozás
-            
-            start_time = time.time()  # Az időszámláló újraindítása
-            play_next_track()  # Az első zeneszám elindítása
+
+    elif show_easy_message:
+        screen.fill((0, 0, 0))
+        easy_message = font.render("Tudsz te ennél jobbat is!", True, text_color)
+        screen.blit(easy_message, (width // 2 - easy_message.get_width() // 2, height // 2 - easy_message.get_height() // 2))
+
+        if show_cancel_button:
+            pygame.draw.rect(screen, button_color, cancel_button_rect)
+            cancel_text = font.render("Mégse", True, text_color)
+            screen.blit(cancel_text, (cancel_button_rect.centerx - cancel_text.get_width() // 2, cancel_button_rect.centery - cancel_text.get_height() // 2))
+
+        pygame.display.update()
+
     else:
         if next_track_time and time.time() >= next_track_time:
             play_next_track()
