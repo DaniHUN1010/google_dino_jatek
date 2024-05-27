@@ -65,7 +65,7 @@ harmadik_track = pygame.mixer.Sound("harmadik_track.mp3")
 
 # Ready és Go képek betöltése
 ready_image = pygame.image.load("ready.png").convert_alpha()
-go_image = pygame.image.load("go2.png").convert_alpha()
+go_image = pygame.image.load("go.png").convert_alpha()
 
 # Zene késleltetési változók
 play_track_delay = 1  # Másodperc
