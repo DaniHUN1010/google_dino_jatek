@@ -35,8 +35,14 @@ rect_speed = 5  # Vízszintes sebesség
 # Karakter képek betöltése és méretezése
 character_right = pygame.image.load("sprite/character/base_right.png").convert_alpha()
 character_left = pygame.image.load("sprite/character/base_left.png").convert_alpha()
+character_jump_right = pygame.image.load("sprite/character/jump/jump_right.png").convert_alpha()
+character_jump_left = pygame.image.load("sprite/character/jump/jump_left.png").convert_alpha()
+
 character_right = pygame.transform.scale(character_right, (rect_width, rect_height))
 character_left = pygame.transform.scale(character_left, (rect_width, rect_height))
+character_jump_right = pygame.transform.scale(character_jump_right, (rect_width, rect_height))
+character_jump_left = pygame.transform.scale(character_jump_left, (rect_width, rect_height))
+
 current_character = character_right  # Kezdő nézet
 
 # Ugrás változók
@@ -126,10 +132,15 @@ while running:
             current_character = character_right
         if (keys[pygame.K_SPACE] or keys[pygame.K_UP]) and not is_jumping and not is_falling:
             is_jumping = True
+            if keys[pygame.K_LEFT]:
+                current_character = character_jump_left
+            elif keys[pygame.K_RIGHT]:
+                current_character = character_jump_right
+            else:
+                current_character = character_jump_left if current_character == character_left else character_jump_right
         if not (keys[pygame.K_SPACE] or keys[pygame.K_UP]) and is_jumping:
             is_jumping = False
-            is_falling = True
-
+            is_falling = True        
         # Háttér mozgatása és ismétlése
         bg_x = bg_x % width  # A háttérkép folyamatos ismétlődésének biztosítása
         screen.blit(BG, (bg_x - width, 0))  # Háttérkép bal oldalon
@@ -150,6 +161,7 @@ while running:
             if rect_y >= initial_y:
                 rect_y = initial_y
                 is_falling = False
+                current_character = character_left if current_character == character_jump_left else character_right
 
         # Karakter kirajzolása
         screen.blit(current_character, (rect_x, rect_y))
