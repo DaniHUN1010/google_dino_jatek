@@ -28,13 +28,13 @@ class FPS:
 fps = FPS()
 
 # Karakter adatai
-rect_width, rect_height = 80, 80  # Sprite méret
+rect_width, rect_height = 75, 85  # Sprite méret
 rect_x, rect_y = width // 2 - rect_width // 2, height - rect_height
 rect_speed = 5  # Vízszintes sebesség
 
 # Karakter képek betöltése és méretezése
-character_right = pygame.image.load("sprite_right_fixed.png").convert_alpha()
-character_left = pygame.image.load("sprite_left_fixed.png").convert_alpha()
+character_right = pygame.image.load("sprite/character/base_right.png").convert_alpha()
+character_left = pygame.image.load("sprite/character/base_left.png").convert_alpha()
 character_right = pygame.transform.scale(character_right, (rect_width, rect_height))
 character_left = pygame.transform.scale(character_left, (rect_width, rect_height))
 current_character = character_right  # Kezdő nézet
