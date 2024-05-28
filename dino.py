@@ -12,7 +12,7 @@ width, height = 800, 600
 screen = pygame.display.set_mode((width, height))
 
 # Háttérkép betöltése
-BG = pygame.transform.scale(pygame.image.load("hatter.jpg"), (width, height))
+BG = pygame.transform.scale(pygame.image.load("kepek/hatter.jpg"), (width, height))
 bg_x = 0
 
 # FPS osztály az FPS megjelenítéséhez
@@ -66,14 +66,14 @@ show_easy_message = False
 show_cancel_button = False
 
 # Zene betöltése
-start_sound = pygame.mixer.Sound("start.mp3")
-elso_track = pygame.mixer.Sound("elso_track.wav")
-masodik_track = pygame.mixer.Sound("masodik_track.wav")
-harmadik_track = pygame.mixer.Sound("harmadik_track.mp3")
+start_sound = pygame.mixer.Sound("zenek/start.mp3")
+elso_track = pygame.mixer.Sound("zenek/elso_track.wav")
+masodik_track = pygame.mixer.Sound("zenek/masodik_track.wav")
+harmadik_track = pygame.mixer.Sound("zenek/harmadik_track.mp3")
 
 # Ready és Go képek betöltése
-ready_image = pygame.image.load("ready.png").convert_alpha()
-go_image = pygame.image.load("go.png").convert_alpha()
+ready_image = pygame.image.load("kepek/ready.png").convert_alpha()
+go_image = pygame.image.load("kepek/go.png").convert_alpha()
 
 # Zene késleltetési változók
 play_track_delay = 1  # Másodperc
