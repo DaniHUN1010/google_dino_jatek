@@ -1,6 +1,7 @@
 import pygame
 import random
 import time
+from itertools import cycle
 
 # Pygame inicializálása
 pygame.init()
@@ -37,11 +38,15 @@ character_right = pygame.image.load("sprite/character/base_right.png").convert_a
 character_left = pygame.image.load("sprite/character/base_left.png").convert_alpha()
 character_jump_right = pygame.image.load("sprite/character/jump/jump_right.png").convert_alpha()
 character_jump_left = pygame.image.load("sprite/character/jump/jump_left.png").convert_alpha()
+idle_right_images = [pygame.image.load("sprite/character/idle/idle_right1.png").convert_alpha()]
+idle_left_images = [pygame.image.load("sprite/character/idle/idle_left1.png").convert_alpha()]
 
 character_right = pygame.transform.scale(character_right, (rect_width, rect_height))
 character_left = pygame.transform.scale(character_left, (rect_width, rect_height))
 character_jump_right = pygame.transform.scale(character_jump_right, (rect_width, rect_height))
 character_jump_left = pygame.transform.scale(character_jump_left, (rect_width, rect_height))
+idle_right_images = [pygame.transform.scale(img, (rect_width, rect_height)) for img in idle_right_images]
+idle_left_images = [pygame.transform.scale(img, (rect_width, rect_height)) for img in idle_left_images]
 
 current_character = character_right  # Kezdő nézet
 
@@ -115,8 +120,22 @@ cancel_button_rect = pygame.Rect(10, height - 60, 100, 50)
 button_color = (70, 130, 180)
 text_color = (255, 255, 255)
 
+# Animációs vezérlés
+idle_time = 2000  # Idő milliszekundumban, mielőtt az animáció elindul
+idle_clock = pygame.time.get_ticks()
+is_idle = False
+
+# Képváltási időzítő
+image_change_time = 500  # 0.5 másodperc képenként
+image_change_clock = pygame.time.get_ticks()
+
+# Képek ciklikus váltása
+right_idle_cycle = cycle([character_right] + idle_right_images)
+left_idle_cycle = cycle([character_left] + idle_left_images)
+
 # Fő játékciklus
 running = True
+facing_right = True  # Jelenlegi nézési irány
 
 while running:
     for event in pygame.event.get():
@@ -174,23 +193,40 @@ while running:
 
         # Billentyűzet bemenetek kezelése
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_LEFT]:
-            bg_x += rect_speed
-            current_character = character_left
-        if keys[pygame.K_RIGHT]:
-            bg_x -= rect_speed
-            current_character = character_right
-        if (keys[pygame.K_SPACE] or keys[pygame.K_UP]) and not is_jumping and not is_falling:
-            is_jumping = True
+        if any(keys):
+            idle_clock = pygame.time.get_ticks()
+            is_idle = False
             if keys[pygame.K_LEFT]:
-                current_character = character_jump_left
-            elif keys[pygame.K_RIGHT]:
-                current_character = character_jump_right
+                bg_x += rect_speed
+                current_character = character_left
+                facing_right = False
+            if keys[pygame.K_RIGHT]:
+                bg_x -= rect_speed
+                current_character = character_right
+                facing_right = True
+            if (keys[pygame.K_SPACE] or keys[pygame.K_UP]) and not is_jumping and not is_falling:
+                is_jumping = True
+                if keys[pygame.K_LEFT]:
+                    current_character = character_jump_left
+                elif keys[pygame.K_RIGHT]:
+                    current_character = character_jump_right
+                else:
+                    current_character = character_jump_left if current_character == character_left else character_jump_right
+            if not (keys[pygame.K_SPACE] or keys[pygame.K_UP]) and is_jumping:
+                is_jumping = False
+                is_falling = True
+        else:
+            if pygame.time.get_ticks() - idle_clock >= idle_time:
+                is_idle = True
+                if pygame.time.get_ticks() - image_change_clock >= image_change_time:
+                    image_change_clock = pygame.time.get_ticks()
+                    if facing_right:
+                        current_character = next(right_idle_cycle)
+                    else:
+                        current_character = next(left_idle_cycle)
             else:
-                current_character = character_jump_left if current_character == character_left else character_jump_right
-        if not (keys[pygame.K_SPACE] or keys[pygame.K_UP]) and is_jumping:
-            is_jumping = False
-            is_falling = True        
+                is_idle = False
+
         # Háttér mozgatása és ismétlése
         bg_x = bg_x % width  # A háttérkép folyamatos ismétlődésének biztosítása
         screen.blit(BG, (bg_x - width, 0))  # Háttérkép bal oldalon
