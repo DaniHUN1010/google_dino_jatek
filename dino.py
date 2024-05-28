@@ -41,12 +41,19 @@ character_jump_left = pygame.image.load("sprite/character/jump/jump_left.png").c
 idle_right_images = [pygame.image.load("sprite/character/idle/idle_right1.png").convert_alpha()]
 idle_left_images = [pygame.image.load("sprite/character/idle/idle_left1.png").convert_alpha()]
 
+# Mozgás animáció képek betöltése
+move_right_images = [pygame.image.load(f"sprite/character/move/move_right{i}.png").convert_alpha() for i in range(1, 6)]
+move_left_images = [pygame.image.load(f"sprite/character/move/move_left{i}.png").convert_alpha() for i in range(1, 6)]
+
+# Karakter képek méretezése
 character_right = pygame.transform.scale(character_right, (rect_width, rect_height))
 character_left = pygame.transform.scale(character_left, (rect_width, rect_height))
 character_jump_right = pygame.transform.scale(character_jump_right, (rect_width, rect_height))
 character_jump_left = pygame.transform.scale(character_jump_left, (rect_width, rect_height))
 idle_right_images = [pygame.transform.scale(img, (rect_width, rect_height)) for img in idle_right_images]
 idle_left_images = [pygame.transform.scale(img, (rect_width, rect_height)) for img in idle_left_images]
+move_right_images = [pygame.transform.scale(img, (rect_width, rect_height)) for img in move_right_images]
+move_left_images = [pygame.transform.scale(img, (rect_width, rect_height)) for img in move_left_images]
 
 current_character = character_right  # Kezdő nézet
 
@@ -126,16 +133,19 @@ idle_clock = pygame.time.get_ticks()
 is_idle = False
 
 # Képváltási időzítő
-image_change_time = 500  # 0.5 másodperc képenként
+image_change_time = 100  # 0.1 másodperc képenként
 image_change_clock = pygame.time.get_ticks()
 
 # Képek ciklikus váltása
 right_idle_cycle = cycle([character_right] + idle_right_images)
 left_idle_cycle = cycle([character_left] + idle_left_images)
+move_right_cycle = cycle(move_right_images)
+move_left_cycle = cycle(move_left_images)
 
 # Fő játékciklus
 running = True
 facing_right = True  # Jelenlegi nézési irány
+is_moving = False
 
 while running:
     for event in pygame.event.get():
@@ -196,13 +206,18 @@ while running:
         if any(keys):
             idle_clock = pygame.time.get_ticks()
             is_idle = False
+            is_moving = True
             if keys[pygame.K_LEFT]:
                 bg_x += rect_speed
-                current_character = character_left
+                if pygame.time.get_ticks() - image_change_clock >= image_change_time:
+                    image_change_clock = pygame.time.get_ticks()
+                    current_character = next(move_left_cycle)
                 facing_right = False
             if keys[pygame.K_RIGHT]:
                 bg_x -= rect_speed
-                current_character = character_right
+                if pygame.time.get_ticks() - image_change_clock >= image_change_time:
+                    image_change_clock = pygame.time.get_ticks()
+                    current_character = next(move_right_cycle)
                 facing_right = True
             if (keys[pygame.K_SPACE] or keys[pygame.K_UP]) and not is_jumping and not is_falling:
                 is_jumping = True
@@ -216,9 +231,10 @@ while running:
                 is_jumping = False
                 is_falling = True
         else:
+            is_moving = False
             if pygame.time.get_ticks() - idle_clock >= idle_time:
                 is_idle = True
-                if pygame.time.get_ticks() - image_change_clock >= image_change_time:
+                if pygame.time.get_ticks() - image_change_clock >= image_change_time*7:
                     image_change_clock = pygame.time.get_ticks()
                     if facing_right:
                         current_character = next(right_idle_cycle)
@@ -226,6 +242,10 @@ while running:
                         current_character = next(left_idle_cycle)
             else:
                 is_idle = False
+
+        # Ha nincs mozgás, visszaáll az alapállapotba
+        if not is_moving and not is_jumping and not is_falling and not is_idle:
+            current_character = character_right if facing_right else character_left
 
         # Háttér mozgatása és ismétlése
         bg_x = bg_x % width  # A háttérkép folyamatos ismétlődésének biztosítása
