@@ -173,6 +173,9 @@ while running:
             idle_clock = pygame.time.get_ticks()
             is_idle = False
             is_moving = True
+            if keys[pygame.K_ESCAPE]:
+                pygame.quit()
+                break
             if keys[pygame.K_LEFT]:
                 bg_x += rect_speed * bg_speed_factor
                 if pygame.time.get_ticks() - image_change_clock >= image_change_time:
