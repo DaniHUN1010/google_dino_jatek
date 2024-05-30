@@ -149,7 +149,7 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-        elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+        elif event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
             if not game_started:  # Ha a játék még nem kezdődött el
                 game_started = True
                 show_ready_go()
@@ -159,7 +159,7 @@ while running:
         # Háttérkép kirajzolása a képernyő közepére
         screen.blit(fox_hatter, ((width - BG.get_width()) // 2, (height - BG.get_height()) // 2))
         # Üzenet kirajzolása a kezdéshez
-        start_text = font.render("Nyomj egy spacet a kezdéshez", True, (255, 255, 255))
+        start_text = font.render("Nyomj egy entert a kezdéshez", True, (255, 255, 255))
         text_rect = start_text.get_rect(center=(width // 2, height // 2))
         screen.blit(start_text, text_rect)
         pygame.display.update()
