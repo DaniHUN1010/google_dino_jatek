@@ -197,7 +197,10 @@ while running:
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 running = False
-            elif event.key == pygame.K_SPACE or pygame.K_UP and not is_jumping and not is_falling:
+            elif event.key == pygame.K_SPACE and not is_jumping and not is_falling:  # Csak a space gombra ugrik
+                is_jumping = True
+                jump_start_y = rect_y  # Az ugrás kezdő y pozíciójának mentése
+            elif event.key == pygame.K_UP and not is_jumping and not is_falling:  # Csak a felfelé nyílra ugrik
                 is_jumping = True
                 jump_start_y = rect_y  # Az ugrás kezdő y pozíciójának mentése
             elif event.key == pygame.K_x and time.time() - last_kick_time >= kick_cooldown:  # Kick cooldown ellenőrzése
@@ -216,6 +219,7 @@ while running:
                     avoid_cycle = cycle(avoid_right_images)
                 else:
                     avoid_cycle = cycle(avoid_left_images)
+
 
     if not game_started:  # Ha a játék még nem kezdődött el
         # Háttérkép kirajzolása a képernyő közepére
