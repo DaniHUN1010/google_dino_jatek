@@ -8,14 +8,9 @@ pygame.init()
 pygame.font.init()
 pygame.mixer.init()
 
-
 # Ablak mérete
 width, height = 800, 600
 screen = pygame.display.set_mode((width, height))
-
-
-
-
 
 # Mosquito kezdő pozíciója és mérete
 mosquito_size = 50
@@ -34,10 +29,6 @@ mosquito2 = pygame.transform.scale(mosquito2, mosquito_size)
 frame_duration = 0.2  # Egy képkocka időtartama másodpercben
 last_frame_change_time = time.time()
 current_frame = 0
-
-
-
-
 
 # Háttérkép betöltése
 BG = pygame.transform.scale(pygame.image.load("kepek/hatter.jpg"), (width, height))
@@ -340,7 +331,6 @@ while running:
                     image_change_clock = pygame.time.get_ticks()
                     current_character = next(avoid_cycle)
 
-
         # Háttér mozgatása és ismétlése
         bg_x = bg_x % width  # A háttérkép folyamatos ismétlődésének biztosítása
         screen.blit(BG, (bg_x - width, 0))  # Háttérkép bal oldalon
@@ -359,10 +349,7 @@ while running:
         time_text = font.render(f"Idő: {elapsed_time}", True, (255, 255, 255))
         screen.blit(time_text, (10, 10))
 
-
-
-
-        # Moswuito mozgatása balra
+        # Mosquito mozgatása balra
         mosquito_x -= mosquito_speed
 
         # Ha a kocka elhagyja a képernyőt balról, kezdjük újra jobbról
@@ -375,26 +362,43 @@ while running:
             current_frame = (current_frame + 1) % 2  # Váltás a két képkocka között
             last_frame_change_time = current_time
 
-
-
-
         # Képernyő frissítése
         if current_frame == 0:
             screen.blit(mosquito1, (mosquito_x, mosquito_y))  # Első képkocka rajzolása
         else:
             screen.blit(mosquito2, (mosquito_x, mosquito_y))  # Második képkocka rajzolása
         pygame.display.update()
-        
-        # Ütközés ellenőrzése (mosquito)
-        mosquito_rect = mosquito1.get_rect(topleft=(mosquito_x, mosquito_y))
-        character_rect = current_character.get_rect(topleft=(rect_x, rect_y))
-        
-        if mosquito_rect.colliderect(character_rect):
-            running = False
-
 
         # FPS korlátozása
         fps.clock.tick(75)
 
+
+
+        # Ütközés ellenőrzése
+        mosquito_rect = mosquito1.get_rect(topleft=(mosquito_x, mosquito_y))
+        character_rect = current_character.get_rect(topleft=(rect_x, rect_y))
+
+        if mosquito_rect.colliderect(character_rect):
+            # Animáció lejátszása ütközéskorw
+            death_animation_images = [
+                pygame.image.load("sprite/character/dead/dead1.png").convert_alpha(),
+                pygame.image.load("sprite/character/dead/dead2.png").convert_alpha(),
+                pygame.image.load("sprite/character/dead/dead3.png").convert_alpha(),
+                pygame.image.load("sprite/character/dead/dead4.png").convert_alpha()
+            ]
+            character_size = (rect_width, rect_height)  # Karakter mérete
+            death_animation_images = [pygame.transform.scale(img, character_size) for img in death_animation_images]
+            
+            death_frame_duration = 0.2  # Minden képkocka időtartama másodpercben
+            for img in death_animation_images:
+                screen.fill((0, 0, 0))  # Fekete háttér rajzolása
+                current_character = img
+                screen.blit(current_character, (rect_x, rect_y))
+                pygame.display.update()
+                pygame.time.delay(int(death_frame_duration * 1000))  # Várakozás képkockánként
+
+            running = False
+
+    
 # Pygame kilépése
 pygame.quit()
