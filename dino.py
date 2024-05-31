@@ -8,14 +8,9 @@ pygame.init()
 pygame.font.init()
 pygame.mixer.init()
 
-
 # Ablak mérete
 width, height = 800, 600
 screen = pygame.display.set_mode((width, height))
-
-
-
-
 
 # Mosquito kezdő pozíciója és mérete
 mosquito_size = 50
@@ -23,8 +18,8 @@ mosquito_x = width
 mosquito_y = 300
 mosquito_speed = 6
 
-mosquito1 = pygame.image.load("sprite/mosquito/mosquito_left1.png")
-mosquito2 = pygame.image.load("sprite/mosquito/mosquito_left2.png")
+mosquito1 = pygame.image.load("sprite/mosquito/mosquito1.png")
+mosquito2 = pygame.image.load("sprite/mosquito/mosquito2.png")
 
 mosquito_size = (80, 80)  # Új méret (szélesség, magasság)
 mosquito1 = pygame.transform.scale(mosquito1, mosquito_size)
@@ -34,10 +29,6 @@ mosquito2 = pygame.transform.scale(mosquito2, mosquito_size)
 frame_duration = 0.2  # Egy képkocka időtartama másodpercben
 last_frame_change_time = time.time()
 current_frame = 0
-
-
-
-
 
 # Háttérkép betöltése
 BG = pygame.transform.scale(pygame.image.load("kepek/hatter.jpg"), (width, height))
@@ -174,7 +165,6 @@ def show_ready_go():
     screen.blit(ready_image, (width // 2 - ready_image.get_width() // 2, height // 2 - ready_image.get_height() // 2))
     pygame.display.update()
 
-    
     # Only play the ready and go sound effects
     pygame.mixer.music.load(start_sound)  # Sound effect
     pygame.mixer.music.play()  # Play sound effect
@@ -201,7 +191,6 @@ attack_image_change_time = 300  # 0.3 másodperc képenként a támadáshoz
 avoid_image_change_time = 200  # 0.2 másodperc képenként az elkerüléshez
 image_change_clock = pygame.time.get_ticks()
 
-
 # Képek ciklikus váltása
 right_idle_cycle = cycle([character_right] + idle_right_images)
 left_idle_cycle = cycle([character_left] + idle_left_images)
@@ -211,7 +200,6 @@ kick_right_cycle = cycle(kick_right_images)
 kick_left_cycle = cycle(kick_left_images)
 avoid_right_cycle = cycle(avoid_right_images)
 avoid_left_cycle = cycle(avoid_left_images)
-
 
 # Fő játékciklus
 running = True
@@ -340,13 +328,11 @@ while running:
                     image_change_clock = pygame.time.get_ticks()
                     current_character = next(avoid_cycle)
 
-
         # Háttér mozgatása és ismétlése
         bg_x = bg_x % width  # A háttérkép folyamatos ismétlődésének biztosítása
         screen.blit(BG, (bg_x - width, 0))  # Háttérkép bal oldalon
         screen.blit(BG, (bg_x, 0))  # Háttérkép középen
         screen.blit(BG, (bg_x + width, 0))  # Háttérkép jobb oldalon
-        
 
         # Karakter megjelenítése
         screen.blit(current_character, (rect_x, rect_y))
@@ -358,9 +344,6 @@ while running:
         elapsed_time = int(time.time() - start_time)
         time_text = font.render(f"Idő: {elapsed_time}", True, (255, 255, 255))
         screen.blit(time_text, (10, 10))
-
-
-
 
         # Moswuito mozgatása balra
         mosquito_x -= mosquito_speed
@@ -375,9 +358,6 @@ while running:
             current_frame = (current_frame + 1) % 2  # Váltás a két képkocka között
             last_frame_change_time = current_time
 
-
-
-
         # Képernyő frissítése
         if current_frame == 0:
             screen.blit(mosquito1, (mosquito_x, mosquito_y))  # Első képkocka rajzolása
@@ -391,7 +371,6 @@ while running:
         
         if mosquito_rect.colliderect(character_rect):
             running = False
-
 
         # FPS korlátozása
         fps.clock.tick(75)
