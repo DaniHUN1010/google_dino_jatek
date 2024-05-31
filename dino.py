@@ -204,8 +204,13 @@ def start_game():
 
 def create_turtle():
     direction = random.choice(["left", "right"])
-    x_pos = width if direction == "right" else -turtle_size[0]
-    turtles.append({"x": x_pos, "y": height - turtle_size[1], "direction": direction})
+    y = initial_y  # A teknős függőleges pozíciója a karakter függőleges pozíciója alatt
+    if direction == "left":
+        x = width  # Kezdési helyzet a jobb oldalon
+    else:
+        x = -turtle_size[0]  # Kezdési helyzet a bal oldalon
+    turtles.append({"x": x, "y": y, "direction": direction})
+
 
 
 def show_ready_go():
@@ -405,9 +410,17 @@ while running:
         if mosquito_x < -mosquito1.get_width():
             mosquito_x = width
 
-        # Új turtle hozzáadása, ha kevesebb mint 4 van a képernyőn
+        # Egy teknős per oldal szabály
+        left_turtles = [turtle for turtle in turtles if turtle["direction"] == "left"]
+        right_turtles = [turtle for turtle in turtles if turtle["direction"] == "right"]
+
+        # Új turtle hozzáadása, ha kevesebb mint 4 van a képernyőn és nincs több egy oldalon
         if len(turtles) < 4:
-            create_turtle()
+            if len(left_turtles) < 1:
+                create_turtle()
+            elif len(right_turtles) < 1:
+                create_turtle()
+
 
         # Turtle mozgatása és törlése, ha elérik a képernyő szélét
         for turtle in turtles:
@@ -417,11 +430,6 @@ while running:
                     current_turtle = next(turtle_left_cycle)
                 else:
                     current_turtle = next(turtle_right_cycle)
-            else:
-                if turtle["direction"] == "left":
-                    current_turtle = turtle_left
-                else:
-                    current_turtle = turtle_right
             turtle_rect = current_turtle.get_rect(topleft=(turtle["x"], turtle["y"]))
             screen.blit(current_turtle, (turtle["x"], turtle["y"]))
             # Turtle mozgatása
@@ -429,6 +437,7 @@ while running:
                 turtle["x"] -= turtle_speed
             else:
                 turtle["x"] += turtle_speed
+
 
         # Töröljük a teknősöket, ha elérik a képernyő szélét
         turtles = [turtle for turtle in turtles if 0 <= turtle["x"] <= width]
