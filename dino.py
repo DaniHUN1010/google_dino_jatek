@@ -8,9 +8,36 @@ pygame.init()
 pygame.font.init()
 pygame.mixer.init()
 
+
 # Ablak mérete
 width, height = 800, 600
 screen = pygame.display.set_mode((width, height))
+
+
+
+
+
+# Mosquito kezdő pozíciója és mérete
+mosquito_size = 50
+mosquito_x = width
+mosquito_y = 300
+mosquito_speed = 6
+
+mosquito1 = pygame.image.load("sprite/mosquito/mosquito_left1.png")
+mosquito2 = pygame.image.load("sprite/mosquito/mosquito_left2.png")
+
+mosquito_size = (80, 80)  # Új méret (szélesség, magasság)
+mosquito1 = pygame.transform.scale(mosquito1, mosquito_size)
+mosquito2 = pygame.transform.scale(mosquito2, mosquito_size)
+
+# Animáció beállítások
+frame_duration = 0.2  # Egy képkocka időtartama másodpercben
+last_frame_change_time = time.time()
+current_frame = 0
+
+
+
+
 
 # Háttérkép betöltése
 BG = pygame.transform.scale(pygame.image.load("kepek/hatter.jpg"), (width, height))
@@ -320,8 +347,39 @@ while running:
         time_text = font.render(f"Idő: {elapsed_time}", True, (255, 255, 255))
         screen.blit(time_text, (10, 10))
 
+
+
+
+        # Moswuito mozgatása balra
+        mosquito_x -= mosquito_speed
+
+        # Ha a kocka elhagyja a képernyőt balról, kezdjük újra jobbról
+        if mosquito_x < -mosquito1.get_width():
+            mosquito_x = width
+
+        # Animáció váltása
+        current_time = time.time()
+        if current_time - last_frame_change_time >= frame_duration:
+            current_frame = (current_frame + 1) % 2  # Váltás a két képkocka között
+            last_frame_change_time = current_time
+
+
+
+
         # Képernyő frissítése
+        if current_frame == 0:
+            screen.blit(mosquito1, (mosquito_x, mosquito_y))  # Első képkocka rajzolása
+        else:
+            screen.blit(mosquito2, (mosquito_x, mosquito_y))  # Második képkocka rajzolása
         pygame.display.update()
+        
+        # Ütközés ellenőrzése (mosquito)
+        mosquito_rect = mosquito1.get_rect(topleft=(mosquito_x, mosquito_y))
+        character_rect = current_character.get_rect(topleft=(rect_x, rect_y))
+        
+        if mosquito_rect.colliderect(character_rect):
+            running = False
+
 
         # FPS korlátozása
         fps.clock.tick(75)
