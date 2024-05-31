@@ -455,12 +455,31 @@ while running:
             screen.blit(mosquito2, (mosquito_x, mosquito_y))  # Második képkocka rajzolása
         pygame.display.update()
         
-        # Ütközés ellenőrzése (mosquito)
+        # Ütközés ellenőrzése
         mosquito_rect = mosquito1.get_rect(topleft=(mosquito_x, mosquito_y))
         character_rect = current_character.get_rect(topleft=(rect_x, rect_y))
-        
+
         if mosquito_rect.colliderect(character_rect):
+            # Animáció lejátszása ütközéskor
+            death_animation_images = [
+                pygame.image.load("sprite/character/dead/dead1.png").convert_alpha(),
+                pygame.image.load("sprite/character/dead/dead2.png").convert_alpha(),
+                pygame.image.load("sprite/character/dead/dead3.png").convert_alpha(),
+                pygame.image.load("sprite/character/dead/dead4.png").convert_alpha()
+            ]
+            character_size = (rect_width, rect_height)  # Karakter mérete
+            death_animation_images = [pygame.transform.scale(img, character_size) for img in death_animation_images]
+            
+            death_frame_duration = 0.2  # Minden képkocka időtartama másodpercben
+            for img in death_animation_images:
+                screen.fill((0, 0, 0))  # Fekete háttér rajzolása
+                current_character = img
+                screen.blit(current_character, (rect_x, rect_y))
+                pygame.display.update()
+                pygame.time.delay(int(death_frame_duration * 1000))  # Várakozás képkockánként
+
             running = False
+
 
         # FPS korlátozása
         fps.clock.tick(75)
