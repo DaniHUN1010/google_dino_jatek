@@ -13,6 +13,11 @@ width, height = 800, 600
 screen = pygame.display.set_mode((width, height))
 pygame.display.set_caption("Dino Game")
 
+# Példányosítás és csoportok hozzáadása
+all_sprites = pygame.sprite.Group()
+turtles = pygame.sprite.Group()
+mosquitoes = pygame.sprite.Group()
+
 # Betöltjük a képeket
 character_left = pygame.image.load("sprite/character/base_left.png").convert_alpha()
 character_right = pygame.image.load("sprite/character/base_right.png").convert_alpha()
@@ -42,7 +47,6 @@ turtles = []
 turtle_size = (80, 80)  # Új méret (szélesség, magasság)
 turtle_speed = 2
 
-
 turtle_left = pygame.image.load("sprite/turtle/turtle_left.png")
 turtle_left1 = pygame.image.load("sprite/turtle/turtle_left1.png")
 turtle_left2 = pygame.image.load("sprite/turtle/turtle_left2.png")
@@ -57,6 +61,10 @@ turtle_left2 = pygame.transform.scale(turtle_left2, turtle_size)
 turtle_right = pygame.transform.scale(turtle_right, turtle_size)
 turtle_right1 = pygame.transform.scale(turtle_right1, turtle_size)
 turtle_right2 = pygame.transform.scale(turtle_right2, turtle_size)
+
+# Timer használata a teknősök megjelenéséhez
+ADDTURTLE = pygame.USEREVENT + 1
+pygame.time.set_timer(ADDTURTLE, random.randint(250, 1000))  # Változás: Véletlenszerű intervallum
 
 
 turtle_size = (80, 80)  # Új méret (szélesség, magasság)
@@ -211,7 +219,41 @@ def create_turtle():
         x = -turtle_size[0]  # Kezdési helyzet a bal oldalon
     turtles.append({"x": x, "y": y, "direction": direction})
 
+# Tekős osztály definiálása
+class Turtle(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__()
+        self.image = turtle_img
+        self.rect = self.image.get_rect()
+        self.rect.x = random.randint(800, 1600)
+        self.rect.y = height - 100  # Adjust based on your game design
+        self.speed = random.randint(3, 6)
 
+    def update(self):
+        self.rect.x -= self.speed
+        if self.rect.x < -self.rect.width:
+            self.rect.x = random.randint(800, 1600)
+
+class Player(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__()
+        self.image = turtle_img
+        self.rect = self.image.get_rect()
+        self.rect.center = (width // 2, height // 2)
+
+turtle_img = pygame.image.load("sprite/turtle/turtle_left.png").convert_alpha()
+player = Player()
+all_sprites.add(player)
+
+
+
+
+def update(self):
+    # Változás: Mozgás irányának meghatározása a kiindulási hely alapján
+    if self.rect.x > 900:
+        self.rect.x -= self.speed
+    else:
+        self.rect.x += self.speed
 
 def show_ready_go():
     global start_sound  # Használjuk a globális start_sound változót
@@ -416,10 +458,12 @@ while running:
 
         # Új turtle hozzáadása, ha kevesebb mint 4 van a képernyőn és nincs több egy oldalon
         if len(turtles) < 4:
-            if len(left_turtles) < 1:
+            # Új teknős hozzáadása, ha nincs egy oldalon sem
+            if len(left_turtles) < 1 and len(right_turtles) < 1:
                 create_turtle()
-            elif len(right_turtles) < 1:
-                create_turtle()
+
+        # Sprite-ok frissítése
+        all_sprites.update()
 
 
         # Turtle mozgatása és törlése, ha elérik a képernyő szélét
@@ -447,9 +491,10 @@ while running:
 
         # Ütközés ellenőrzése (turtle)
         for turtle in turtles:
-            turtle_rect = turtle_left1.get_rect(topleft=(turtle["x"], turtle["y"]))
+            turtle_rect = current_turtle.get_rect(topleft=(turtle["x"], turtle["y"]))
             if turtle_rect.colliderect(character_rect):
-                running = False
+                running = False  # Játék véget ér
+                break  # Kilépünk a ciklusból, hogy elkerüljük a többszörös ütközés kezelést
 
         # Animáció váltása
         current_time = time.time()
