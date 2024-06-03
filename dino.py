@@ -305,79 +305,72 @@ running = True
 facing_right = True  # Jelenlegi nézési irány
 is_moving = False
 game_started = False  # Új változó a játék kezdésének követéséhez
-def main():
-    while running:
-        screen.fill(white)
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
+
+while running:
+    screen.fill(white)
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+        elif event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
+            if not game_started:  # Ha a játék még nem kezdődött el
+                game_started = True
+                show_ready_go()
+                start_game()
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
                 running = False
-            elif event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
-                if not game_started:  # Ha a játék még nem kezdődött el
-                    game_started = True
-                    show_ready_go()
-                    start_game()
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    running = False
-                elif event.key == pygame.K_SPACE and not is_jumping and not is_falling:  # Csak a space gombra ugrik
-                    is_jumping = True
-                    jump_start_y = rect_y  # Az ugrás kezdő y pozíciójának mentése
-                elif event.key == pygame.K_UP and not is_jumping and not is_falling:  # Csak a felfelé nyílra ugrik
-                    is_jumping = True
-                    jump_start_y = rect_y  # Az ugrás kezdő y pozíciójának mentése
-                # Támadás indítása
-                elif event.key == pygame.K_x and time.time() - last_kick_time >= kick_cooldown and not is_jumping and not is_falling:
-                    is_attacking = True
-                    attack_start_time = time.time()
-                    last_kick_time = time.time()
-                    attack_cycle = cycle(kick_right_images if facing_right else kick_left_images)
-                elif event.key == pygame.K_LSHIFT and time.time() - last_avoid_time >= avoid_cooldown:  # Avoid cooldown ellenőrzése
-                    is_avoiding = True
-                    avoid_start_time = time.time()
-                    last_avoid_time = time.time()  # Utolsó elkerülés időpontjának frissítése
-                    if facing_right:
-                        avoid_cycle = cycle(avoid_right_images)
-                    else:
-                        avoid_cycle = cycle(avoid_left_images)
-
-        if not game_started:  # Ha a játék még nem kezdődött el
-            # Háttérkép kirajzolása a képernyő közepére
-            screen.blit(fox_hatter, ((width - BG.get_width()) // 2, (height - BG.get_height()) // 2))
-            # Üzenet kirajzolása a kezdéshez
-            start_text = font.render("Nyomj egy entert a kezdéshez", True, (255, 255, 255))
-            text_rect = start_text.get_rect(center=(width // 2, height // 2))
-            screen.blit(start_text, text_rect)
-            pygame.display.update()
-            continue  # A ciklus újrakezdése
-        else:
-            if next_track_time and time.time() >= next_track_time:
-                play_next_track()
-
-            # Billentyűzet bemenetek kezelése
-            keys = pygame.key.get_pressed()
-            if any(keys) and not is_attacking and not is_avoiding:
-                idle_clock = pygame.time.get_ticks()
-                is_idle = False
-                is_moving = True
-                if keys[pygame.K_LEFT]:
-                    bg_x += rect_speed  # Háttér mozgása jobbra
-                    if pygame.time.get_ticks() - image_change_clock >= move_image_change_time:
-                        image_change_clock = pygame.time.get_ticks()
-                        current_character = next(move_left_cycle)
-                    facing_right = False
-                elif keys[pygame.K_RIGHT]:
-                    bg_x -= rect_speed  # Háttér mozgása balra
-                    if pygame.time.get_ticks() - image_change_clock >= move_image_change_time:
-                        image_change_clock = pygame.time.get_ticks()
-                        current_character = next(move_right_cycle)
-                    facing_right = True
+            elif event.key == pygame.K_SPACE and not is_jumping and not is_falling:  # Csak a space gombra ugrik
+                is_jumping = True
+                jump_start_y = rect_y  # Az ugrás kezdő y pozíciójának mentése
+            elif event.key == pygame.K_UP and not is_jumping and not is_falling:  # Csak a felfelé nyílra ugrik
+                is_jumping = True
+                jump_start_y = rect_y  # Az ugrás kezdő y pozíciójának mentése
+            # Támadás indítása
+            elif event.key == pygame.K_x and time.time() - last_kick_time >= kick_cooldown and not is_jumping and not is_falling:
+                is_attacking = True
+                attack_start_time = time.time()
+                last_kick_time = time.time()
+                attack_cycle = cycle(kick_right_images if facing_right else kick_left_images)
+            elif event.key == pygame.K_LSHIFT and time.time() - last_avoid_time >= avoid_cooldown:  # Avoid cooldown ellenőrzése
+                is_avoiding = True
+                avoid_start_time = time.time()
+                last_avoid_time = time.time()  # Utolsó elkerülés időpontjának frissítése
+                if facing_right:
+                    avoid_cycle = cycle(avoid_right_images)
                 else:
-                    is_moving = False
-                    if facing_right:
-                        current_character = character_right
-                    else:
-                        current_character = character_left
-                    current_character = character_right if facing_right else character_left
+                    avoid_cycle = cycle(avoid_left_images)
+
+    if not game_started:  # Ha a játék még nem kezdődött el
+        # Háttérkép kirajzolása a képernyő közepére
+        screen.blit(fox_hatter, ((width - BG.get_width()) // 2, (height - BG.get_height()) // 2))
+        # Üzenet kirajzolása a kezdéshez
+        start_text = font.render("Nyomj egy entert a kezdéshez", True, (255, 255, 255))
+        text_rect = start_text.get_rect(center=(width // 2, height // 2))
+        screen.blit(start_text, text_rect)
+        pygame.display.update()
+        continue  # A ciklus újrakezdése
+    else:
+        if next_track_time and time.time() >= next_track_time:
+            play_next_track()
+
+        # Billentyűzet bemenetek kezelése
+        keys = pygame.key.get_pressed()
+        if any(keys) and not is_attacking and not is_avoiding:
+            idle_clock = pygame.time.get_ticks()
+            is_idle = False
+            is_moving = True
+            if keys[pygame.K_LEFT]:
+                bg_x += rect_speed  # Háttér mozgása jobbra
+                if pygame.time.get_ticks() - image_change_clock >= move_image_change_time:
+                    image_change_clock = pygame.time.get_ticks()
+                    current_character = next(move_left_cycle)
+                facing_right = False
+            elif keys[pygame.K_RIGHT]:
+                bg_x -= rect_speed  # Háttér mozgása balra
+                if pygame.time.get_ticks() - image_change_clock >= move_image_change_time:
+                    image_change_clock = pygame.time.get_ticks()
+                    current_character = next(move_right_cycle)
+                facing_right = True
             else:
                 is_moving = False
                 if facing_right:
@@ -385,161 +378,165 @@ def main():
                 else:
                     current_character = character_left
                 current_character = character_right if facing_right else character_left
-
-            # Ugrás és esés kezelése
-            if is_jumping:
-                rect_y -= jump_speed
-                if rect_y <= max_jump_height:
-                    is_jumping = False
-                    is_falling = True
-            if is_falling:
-                rect_y += fall_speed
-                if rect_y >= initial_y:
-                    is_falling = False
-                    rect_y = initial_y
-
-            # Támadás logika
-            if is_attacking:
-                if time.time() - attack_start_time >= attack_duration:
-                    is_attacking = False
-                    current_character = character_right if facing_right else character_left
-                    if is_moving:
-                        if facing_right:
-                            current_character = next(move_right_cycle)
-                        else:
-                            current_character = next(move_left_cycle)
-                else:
-                    if pygame.time.get_ticks() - image_change_clock >= attack_image_change_time:
-                        image_change_clock = pygame.time.get_ticks()
-                        current_character = next(attack_cycle)
-
-            # Elkerülés logika
-            if is_avoiding:
-                if time.time() - avoid_start_time >= avoid_duration:
-                    is_avoiding = False
-                    current_character = character_right if facing_right else character_left
-                    if is_moving:
-                        if facing_right:
-                            current_character = next(move_right_cycle)
-                        else:
-                            current_character = next(move_left_cycle)
-                else:
-                    if pygame.time.get_ticks() - image_change_clock >= avoid_image_change_time:
-                        image_change_clock = pygame.time.get_ticks()
-                        current_character = next(avoid_cycle)
-
-            # Háttér mozgatása és ismétlése
-            bg_x = bg_x % width  # A háttérkép folyamatos ismétlődésének biztosítása
-            screen.blit(BG, (bg_x - width, 0))  # Háttérkép bal oldalon
-            screen.blit(BG, (bg_x, 0))  # Háttérkép középen
-            screen.blit(BG, (bg_x + width, 0))  # Háttérkép jobb oldalon
-
-            # Karakter megjelenítése
-            screen.blit(current_character, (rect_x, rect_y))
-
-            # FPS megjelenítése
-            fps.render(screen)
-
-            # Időszámláló kirajzolása
-            elapsed_time = int(time.time() - start_time)
-            time_text = font.render(f"Idő: {elapsed_time}", True, (255, 255, 255))
-            screen.blit(time_text, (10, 10))
-
-            # Mosquito mozgatása balra
-            mosquito_x -= mosquito_speed
-
-            # Ha a mosquito elhagyja a képernyőt balról, kezdjük újra jobbról
-            if mosquito_x < -mosquito1.get_width():
-                mosquito_x = width
-
-            # Egy teknős per oldal szabály
-            left_turtles = [turtle for turtle in turtles if turtle["direction"] == "left"]
-            right_turtles = [turtle for turtle in turtles if turtle["direction"] == "right"]
-
-            # Új turtle hozzáadása, ha kevesebb mint 4 van a képernyőn és nincs több egy oldalon
-            if len(turtles) < 4:
-                # Új teknős hozzáadása, ha nincs egy oldalon sem
-                if len(left_turtles) < 1 and len(right_turtles) < 1:
-                    create_turtle()
-
-            # Sprite-ok frissítése
-            all_sprites.update()
-
-
-            # Turtle mozgatása és törlése, ha elérik a képernyő szélét
-            for turtle in turtles:
-                if pygame.time.get_ticks() - image_change_clock >= turtle_image_change_time:
-                    image_change_clock = pygame.time.get_ticks()
-                    if turtle["direction"] == "left":
-                        current_turtle = next(turtle_left_cycle)
-                    else:
-                        current_turtle = next(turtle_right_cycle)
-                turtle_rect = current_turtle.get_rect(topleft=(turtle["x"], turtle["y"]))
-                screen.blit(current_turtle, (turtle["x"], turtle["y"]))
-                # Turtle mozgatása
-                if turtle["direction"] == "left":
-                    turtle["x"] -= turtle_speed
-                else:
-                    turtle["x"] += turtle_speed
-
-
-            # Töröljük a teknősöket, ha elérik a képernyő szélét
-            turtles = [turtle for turtle in turtles if 0 <= turtle["x"] <= width]
-
-            # Karakter téglalapjának frissítése
-            character_rect = character.get_rect(topleft=(character_x, character_y))
-
-            # Ütközés ellenőrzése (turtle)
-            for turtle in turtles:
-                turtle_rect = current_turtle.get_rect(topleft=(turtle["x"], turtle["y"]))
-                if turtle_rect.colliderect(character_rect):
-                    running = False  # Játék véget ér
-                    break  # Kilépünk a ciklusból, hogy elkerüljük a többszörös ütközés kezelést
-
-            # Animáció váltása
-            current_time = time.time()
-            if current_time - last_frame_change_time >= frame_duration:
-                current_frame = (current_frame + 1) % 2  # Váltás a két képkocka között
-                last_frame_change_time = current_time
-
-            # Képernyő frissítése
-            if current_frame == 0:
-                screen.blit(mosquito1, (mosquito_x, mosquito_y))  # Első képkocka rajzolása
+        else:
+            is_moving = False
+            if facing_right:
+                current_character = character_right
             else:
-                screen.blit(mosquito2, (mosquito_x, mosquito_y))  # Második képkocka rajzolása
-            pygame.display.update()
+                current_character = character_left
+            current_character = character_right if facing_right else character_left
 
-            # Ütközés ellenőrzése
-            mosquito_rect = mosquito1.get_rect(topleft=(mosquito_x, mosquito_y))
-            character_rect = current_character.get_rect(topleft=(rect_x, rect_y))
+        # Ugrás és esés kezelése
+        if is_jumping:
+            rect_y -= jump_speed
+            if rect_y <= max_jump_height:
+                is_jumping = False
+                is_falling = True
+        if is_falling:
+            rect_y += fall_speed
+            if rect_y >= initial_y:
+                is_falling = False
+                rect_y = initial_y
 
-            if mosquito_rect.colliderect(character_rect):
-                # Animáció lejátszása ütközéskor
-                death_animation_images = [
-                    pygame.image.load("sprite/character/dead/dead1.png").convert_alpha(),
-                    pygame.image.load("sprite/character/dead/dead2.png").convert_alpha(),
-                    pygame.image.load("sprite/character/dead/dead3.png").convert_alpha(),
-                    pygame.image.load("sprite/character/dead/dead4.png").convert_alpha()
-                ]
-                character_size = (rect_width, rect_height)  # Karakter mérete
-                death_animation_images = [pygame.transform.scale(img, character_size) for img in death_animation_images]
+        # Támadás logika
+        if is_attacking:
+            if time.time() - attack_start_time >= attack_duration:
+                is_attacking = False
+                current_character = character_right if facing_right else character_left
+                if is_moving:
+                    if facing_right:
+                        current_character = next(move_right_cycle)
+                    else:
+                        current_character = next(move_left_cycle)
+            else:
+                if pygame.time.get_ticks() - image_change_clock >= attack_image_change_time:
+                    image_change_clock = pygame.time.get_ticks()
+                    current_character = next(attack_cycle)
+        
+        # Elkerülés logika
+        if is_avoiding:
+            if time.time() - avoid_start_time >= avoid_duration:
+                is_avoiding = False
+                current_character = character_right if facing_right else character_left
+                if is_moving:
+                    if facing_right:
+                        current_character = next(move_right_cycle)
+                    else:
+                        current_character = next(move_left_cycle)
+            else:
+                if pygame.time.get_ticks() - image_change_clock >= avoid_image_change_time:
+                    image_change_clock = pygame.time.get_ticks()
+                    current_character = next(avoid_cycle)
 
-                death_frame_duration = 0.2  # Minden képkocka időtartama másodpercben
-                for img in death_animation_images:
-                    screen.fill((0, 0, 0))  # Fekete háttér rajzolása
-                    current_character = img
-                    screen.blit(current_character, (rect_x, rect_y))
-                    pygame.display.update()
-                    pygame.time.delay(int(death_frame_duration * 1000))  # Várakozás képkockánként
+        # Háttér mozgatása és ismétlése
+        bg_x = bg_x % width  # A háttérkép folyamatos ismétlődésének biztosítása
+        screen.blit(BG, (bg_x - width, 0))  # Háttérkép bal oldalon
+        screen.blit(BG, (bg_x, 0))  # Háttérkép középen
+        screen.blit(BG, (bg_x + width, 0))  # Háttérkép jobb oldalon
 
-                running = False
+        # Karakter megjelenítése
+        screen.blit(current_character, (rect_x, rect_y))
+            
+        # FPS megjelenítése
+        fps.render(screen)
+
+        # Időszámláló kirajzolása
+        elapsed_time = int(time.time() - start_time)
+        time_text = font.render(f"Idő: {elapsed_time}", True, (255, 255, 255))
+        screen.blit(time_text, (10, 10))
+
+        # Mosquito mozgatása balra
+        mosquito_x -= mosquito_speed
+
+        # Ha a mosquito elhagyja a képernyőt balról, kezdjük újra jobbról
+        if mosquito_x < -mosquito1.get_width():
+            mosquito_x = width
+
+        # Egy teknős per oldal szabály
+        left_turtles = [turtle for turtle in turtles if turtle["direction"] == "left"]
+        right_turtles = [turtle for turtle in turtles if turtle["direction"] == "right"]
+
+        # Új turtle hozzáadása, ha kevesebb mint 4 van a képernyőn és nincs több egy oldalon
+        if len(turtles) < 4:
+            # Új teknős hozzáadása, ha nincs egy oldalon sem
+            if len(left_turtles) < 1 and len(right_turtles) < 1:
+                create_turtle()
+
+        # Sprite-ok frissítése
+        all_sprites.update()
 
 
-            # FPS korlátozása
-            fps.clock.tick(75)
+        # Turtle mozgatása és törlése, ha elérik a képernyő szélét
+        for turtle in turtles:
+            if pygame.time.get_ticks() - image_change_clock >= turtle_image_change_time:
+                image_change_clock = pygame.time.get_ticks()
+                if turtle["direction"] == "left":
+                    current_turtle = next(turtle_left_cycle)
+                else:
+                    current_turtle = next(turtle_right_cycle)
+            turtle_rect = current_turtle.get_rect(topleft=(turtle["x"], turtle["y"]))
+            screen.blit(current_turtle, (turtle["x"], turtle["y"]))
+            # Turtle mozgatása
+            if turtle["direction"] == "left":
+                turtle["x"] -= turtle_speed
+            else:
+                turtle["x"] += turtle_speed
 
-    # Pygame kilépése
-    pygame.quit()
 
-if __name__ == "__main__":
-    main()
+        # Töröljük a teknősöket, ha elérik a képernyő szélét
+        turtles = [turtle for turtle in turtles if 0 <= turtle["x"] <= width]
+
+        # Karakter téglalapjának frissítése
+        character_rect = character.get_rect(topleft=(character_x, character_y))
+
+        # Ütközés ellenőrzése (turtle)
+        for turtle in turtles:
+            turtle_rect = current_turtle.get_rect(topleft=(turtle["x"], turtle["y"]))
+            if turtle_rect.colliderect(character_rect):
+                running = False  # Játék véget ér
+                break  # Kilépünk a ciklusból, hogy elkerüljük a többszörös ütközés kezelést
+
+        # Animáció váltása
+        current_time = time.time()
+        if current_time - last_frame_change_time >= frame_duration:
+            current_frame = (current_frame + 1) % 2  # Váltás a két képkocka között
+            last_frame_change_time = current_time
+
+        # Képernyő frissítése
+        if current_frame == 0:
+            screen.blit(mosquito1, (mosquito_x, mosquito_y))  # Első képkocka rajzolása
+        else:
+            screen.blit(mosquito2, (mosquito_x, mosquito_y))  # Második képkocka rajzolása
+        pygame.display.update()
+        
+        # Ütközés ellenőrzése
+        mosquito_rect = mosquito1.get_rect(topleft=(mosquito_x, mosquito_y))
+        character_rect = current_character.get_rect(topleft=(rect_x, rect_y))
+
+        if mosquito_rect.colliderect(character_rect):
+            # Animáció lejátszása ütközéskor
+            death_animation_images = [
+                pygame.image.load("sprite/character/dead/dead1.png").convert_alpha(),
+                pygame.image.load("sprite/character/dead/dead2.png").convert_alpha(),
+                pygame.image.load("sprite/character/dead/dead3.png").convert_alpha(),
+                pygame.image.load("sprite/character/dead/dead4.png").convert_alpha()
+            ]
+            character_size = (rect_width, rect_height)  # Karakter mérete
+            death_animation_images = [pygame.transform.scale(img, character_size) for img in death_animation_images]
+            
+            death_frame_duration = 0.2  # Minden képkocka időtartama másodpercben
+            for img in death_animation_images:
+                screen.fill((0, 0, 0))  # Fekete háttér rajzolása
+                current_character = img
+                screen.blit(current_character, (rect_x, rect_y))
+                pygame.display.update()
+                pygame.time.delay(int(death_frame_duration * 1000))  # Várakozás képkockánként
+
+            running = False
+
+
+        # FPS korlátozása
+        fps.clock.tick(75)
+
+# Pygame kilépése
+pygame.quit()
