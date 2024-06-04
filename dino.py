@@ -226,12 +226,16 @@ while running:
             is_moving = True
             if keys[pygame.K_LEFT]:
                 bg_x += rect_speed  # Háttér mozgása jobbra
+                mosquito_x += rect_speed  # Mosquito pozíciójának korrigálása
+                turtle_x += rect_speed  # Turtle pozíciójának korrigálása
                 if pygame.time.get_ticks() - image_change_clock >= move_image_change_time:
                     image_change_clock = pygame.time.get_ticks()
                     current_character = next(move_left_cycle)
                 facing_right = False
             elif keys[pygame.K_RIGHT]:
                 bg_x -= rect_speed  # Háttér mozgása balra
+                mosquito_x -= rect_speed  # Mosquito pozíciójának korrigálása
+                turtle_x -= rect_speed  # Turtle pozíciójának korrigálása
                 if pygame.time.get_ticks() - image_change_clock >= move_image_change_time:
                     image_change_clock = pygame.time.get_ticks()
                     current_character = next(move_right_cycle)
@@ -318,8 +322,8 @@ while running:
 
         
         # Ütközés ellenőrzése
-        mosquito_rect = mosquito1.get_rect(topleft=(mosquito_x, mosquito_y))
-        character_rect = current_character.get_rect(topleft=(rect_x, rect_y))
+        mosquito_rect = mosquito1.get_rect(topleft=(mosquito_x, mosquito_y)).inflate(-10, -10)
+        character_rect = current_character.get_rect(topleft=(rect_x, rect_y)).inflate(-10, -10)
 
         if mosquito_rect.colliderect(character_rect):
             # Animáció lejátszása ütközéskor
@@ -343,8 +347,8 @@ while running:
             running = False
 
         # Ütközés ellenőrzése (Turtle)
-        turtle_rect = turtle.get_rect(topleft=(turtle_x, turtle_y))
-        turtle_rect = current_character.get_rect(topleft=(turtle_x, turtle_y))
+        turtle_rect = turtle.get_rect(topleft=(turtle_x, turtle_y)).inflate(-30, -30)  # Csökkentett hitbox
+        turtle_rect = current_character.get_rect(topleft=(turtle_x, turtle_y)).inflate(-30, -30)  # Csökkentett hitbox
 
         if turtle_rect.colliderect(character_rect):
             # Animáció lejátszása ütközéskor
