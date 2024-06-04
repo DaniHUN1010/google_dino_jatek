@@ -147,16 +147,16 @@ current_track_index = 0
 
 # Zenék betöltése
 start_sound = "zenek/start.mp3"
-elso_track = pygame.mixer.Sound("zenek/elso_track.wav")
-masodik_track = pygame.mixer.Sound("zenek/masodik_track.wav")
+elso_track = pygame.mixer.Sound("zenek/elso_track.mp3")
+masodik_track = pygame.mixer.Sound("zenek/masodik_track.mp3")
 harmadik_track = pygame.mixer.Sound("zenek/harmadik_track.mp3")
 negyedik_track = pygame.mixer.Sound("zenek/negyedik_track.mp3")
 otodik_track = pygame.mixer.Sound("zenek/otodik_track.mp3")
 hatodik_track = pygame.mixer.Sound("zenek/hatodik_track.mp3")
 hetedik_track = pygame.mixer.Sound("zenek/hetedik_track.mp3")
 nyolcadik_track = pygame.mixer.Sound("zenek/nyolcadik_track.mp3")
-kilencedik_track = pygame.mixer.Sound("zenek/kilencedik_track.mp3")
-tizedik_track = pygame.mixer.Sound("zenek/tizedik_track.mp3")
+kilencedik_track = pygame.mixer.Sound("zenek/kilencedik_track.wav")
+tizedik_track = pygame.mixer.Sound("zenek/tizedik_track.wav")
 
 # Trackek betöltése
 tracks = [elso_track, masodik_track, harmadik_track, negyedik_track, otodik_track, hatodik_track, hetedik_track, nyolcadik_track, kilencedik_track, tizedik_track]
