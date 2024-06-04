@@ -77,18 +77,6 @@ idle_left_images = [pygame.image.load("sprite/character/idle/idle_left1.png").co
 move_right_images = [pygame.image.load(f"sprite/character/move/move_right{i}.png").convert_alpha() for i in range(1, 6)]
 move_left_images = [pygame.image.load(f"sprite/character/move/move_left{i}.png").convert_alpha() for i in range(1, 6)]
 
-# Rugás animáció képek betöltése
-kick_right_images = [pygame.image.load("sprite/character/kick/kick_right1.png").convert_alpha(),
-                     pygame.image.load("sprite/character/kick/kick_right2.png").convert_alpha()]
-kick_left_images = [pygame.image.load("sprite/character/kick/kick_left1.png").convert_alpha(),
-                    pygame.image.load("sprite/character/kick/kick_left2.png").convert_alpha()]
-
-# Elkerülés animáció képek betöltése
-avoid_right_images = [pygame.image.load("sprite/character/avoid/avoid_right1.png").convert_alpha(),
-                      pygame.image.load("sprite/character/avoid/avoid_right2.png").convert_alpha()]
-avoid_left_images = [pygame.image.load("sprite/character/avoid/avoid_left1.png").convert_alpha(),
-                     pygame.image.load("sprite/character/avoid/avoid_left2.png").convert_alpha()]
-
 # Karakter képek méretezése
 character_right = pygame.transform.scale(character_right, (rect_width, rect_height))
 character_left = pygame.transform.scale(character_left, (rect_width, rect_height))
@@ -98,10 +86,6 @@ idle_right_images = [pygame.transform.scale(img, (rect_width, rect_height)) for 
 idle_left_images = [pygame.transform.scale(img, (rect_width, rect_height)) for img in idle_left_images]
 move_right_images = [pygame.transform.scale(img, (rect_width, rect_height)) for img in move_right_images]
 move_left_images = [pygame.transform.scale(img, (rect_width, rect_height)) for img in move_left_images]
-kick_right_images = [pygame.transform.scale(img, (rect_width, rect_height)) for img in kick_right_images]
-kick_left_images = [pygame.transform.scale(img, (rect_width, rect_height)) for img in kick_left_images]
-avoid_right_images = [pygame.transform.scale(img, (rect_width, rect_height)) for img in avoid_right_images]
-avoid_left_images = [pygame.transform.scale(img, (rect_width, rect_height)) for img in avoid_left_images]
 
 current_character = character_right  # Kezdő nézet
 
@@ -113,20 +97,6 @@ jump_height = rect_height * 2  # Ugrási magasság
 jump_speed = rect_speed * 2.5  # Ugrási sebesség növelése a gyorsabb és magasabb ugráshoz
 fall_speed = jump_speed * 0.8  # Esési sebesség egy kicsit kisebb, hogy simább legyen az esés
 max_jump_height = initial_y - jump_height
-
-# Támadás változók
-is_attacking = False
-attack_start_time = 0
-attack_duration = 0.4  # 0.4 másodperc (két képkocka 0.2 másodpercenként)
-last_kick_time = 0
-kick_cooldown = 1  # 1 másodperc
-
-# Elkerülés változók
-is_avoiding = False
-avoid_start_time = 0
-avoid_duration = 0.2  # 0.2 másodperc
-last_avoid_time = 0
-avoid_cooldown = 1  # 1 másodperc
 
 # Időszámláló
 start_time = time.time()
@@ -210,10 +180,6 @@ right_idle_cycle = cycle([character_right] + idle_right_images)
 left_idle_cycle = cycle([character_left] + idle_left_images)
 move_right_cycle = cycle(move_right_images)
 move_left_cycle = cycle(move_left_images)
-kick_right_cycle = cycle(kick_right_images)
-kick_left_cycle = cycle(kick_left_images)
-avoid_right_cycle = cycle(avoid_right_images)
-avoid_left_cycle = cycle(avoid_left_images)
 
 # Fő játékciklus
 running = True
@@ -239,21 +205,6 @@ while running:
             elif event.key == pygame.K_UP and not is_jumping and not is_falling:  # Csak a felfelé nyílra ugrik
                 is_jumping = True
                 jump_start_y = rect_y  # Az ugrás kezdő y pozíciójának mentése
-            # Támadás indítása
-            elif event.key == pygame.K_x and time.time() - last_kick_time >= kick_cooldown and not is_jumping and not is_falling:
-                is_attacking = True
-                attack_start_time = time.time()
-                last_kick_time = time.time()
-                attack_cycle = cycle(kick_right_images if facing_right else kick_left_images)
-            elif event.key == pygame.K_LSHIFT and time.time() - last_avoid_time >= avoid_cooldown:  # Avoid cooldown ellenőrzése
-                is_avoiding = True
-                avoid_start_time = time.time()
-                last_avoid_time = time.time()  # Utolsó elkerülés időpontjának frissítése
-                if facing_right:
-                    avoid_cycle = cycle(avoid_right_images)
-                else:
-                    avoid_cycle = cycle(avoid_left_images)
-
     if not game_started:  # Ha a játék még nem kezdődött el
         # Háttérkép kirajzolása a képernyő közepére
         screen.blit(fox_hatter, ((width - BG.get_width()) // 2, (height - BG.get_height()) // 2))
@@ -269,7 +220,7 @@ while running:
 
         # Billentyűzet bemenetek kezelése
         keys = pygame.key.get_pressed()
-        if any(keys) and not is_attacking and not is_avoiding:
+        if any(keys):
             idle_clock = pygame.time.get_ticks()
             is_idle = False
             is_moving = True
@@ -311,36 +262,6 @@ while running:
             if rect_y >= initial_y:
                 is_falling = False
                 rect_y = initial_y
-
-        # Támadás logika
-        if is_attacking:
-            if time.time() - attack_start_time >= attack_duration:
-                is_attacking = False
-                current_character = character_right if facing_right else character_left
-                if is_moving:
-                    if facing_right:
-                        current_character = next(move_right_cycle)
-                    else:
-                        current_character = next(move_left_cycle)
-            else:
-                if pygame.time.get_ticks() - image_change_clock >= attack_image_change_time:
-                    image_change_clock = pygame.time.get_ticks()
-                    current_character = next(attack_cycle)
-        
-        # Elkerülés logika
-        if is_avoiding:
-            if time.time() - avoid_start_time >= avoid_duration:
-                is_avoiding = False
-                current_character = character_right if facing_right else character_left
-                if is_moving:
-                    if facing_right:
-                        current_character = next(move_right_cycle)
-                    else:
-                        current_character = next(move_left_cycle)
-            else:
-                if pygame.time.get_ticks() - image_change_clock >= avoid_image_change_time:
-                    image_change_clock = pygame.time.get_ticks()
-                    current_character = next(avoid_cycle)
 
         # Háttér mozgatása és ismétlése
         bg_x = bg_x % width  # A háttérkép folyamatos ismétlődésének biztosítása
