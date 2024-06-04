@@ -12,23 +12,6 @@ pygame.mixer.init()
 width, height = 800, 600
 screen = pygame.display.set_mode((width, height))
 pygame.display.set_caption("Dino Game")
-
-# Példányosítás és csoportok hozzáadása
-all_sprites = pygame.sprite.Group()
-turtles = pygame.sprite.Group()
-mosquitoes = pygame.sprite.Group()
-
-# Betöltjük a képeket
-character_left = pygame.image.load("sprite/character/base_left.png").convert_alpha()
-character_right = pygame.image.load("sprite/character/base_right.png").convert_alpha()
-character = character_right  # Kezdő irány jobbra
-character_x, character_y = 100, height - 100
-character_speed = 5
-
-turtle_left1 = pygame.image.load("sprite/turtle/turtle_left1.png").convert_alpha()
-turtle_size = turtle_left1.get_size()
-turtle_speed = 2
-
 # Mosquito kezdő pozíciója és mérete
 mosquito_size = 50
 mosquito_x = width
@@ -41,40 +24,20 @@ mosquito2 = pygame.image.load("sprite/mosquito/mosquito2.png")
 mosquito_size = (80, 80)  # Új méret (szélesség, magasság)
 mosquito1 = pygame.transform.scale(mosquito1, mosquito_size)
 mosquito2 = pygame.transform.scale(mosquito2, mosquito_size)
-
 # Turtle kezdő pozíciója és mérete
-turtles = []
-turtle_size = (80, 80)  # Új méret (szélesség, magasság)
-turtle_speed = 2
+turtle_size = 50
+turtle_x = width
+turtle_y = 530
+turtle_speed = 3  # Csökkentett sebesség a könnyebb játék érdekében
 
-turtle_left = pygame.image.load("sprite/turtle/turtle_left.png")
-turtle_left1 = pygame.image.load("sprite/turtle/turtle_left1.png")
-turtle_left2 = pygame.image.load("sprite/turtle/turtle_left2.png")
-
-turtle_right = pygame.image.load("sprite/turtle/turtle_left.png")
-turtle_right1 = pygame.image.load("sprite/turtle/turtle_left1.png")
-turtle_right2 = pygame.image.load("sprite/turtle/turtle_left2.png")
-
-turtle_left = pygame.transform.scale(turtle_left, turtle_size)
-turtle_left1 = pygame.transform.scale(turtle_left1, turtle_size)
-turtle_left2 = pygame.transform.scale(turtle_left2, turtle_size)
-turtle_right = pygame.transform.scale(turtle_right, turtle_size)
-turtle_right1 = pygame.transform.scale(turtle_right1, turtle_size)
-turtle_right2 = pygame.transform.scale(turtle_right2, turtle_size)
-
-# Timer használata a teknősök megjelenéséhez
-ADDTURTLE = pygame.USEREVENT + 1
-pygame.time.set_timer(ADDTURTLE, random.randint(250, 1000))  # Változás: Véletlenszerű intervallum
-
+turtle = pygame.image.load("sprite/turtle/turtle_left.png")
+turtle1 = pygame.image.load("sprite/turtle/turtle_left1.png")
+turtle2 = pygame.image.load("sprite/turtle/turtle_left2.png")
 
 turtle_size = (80, 80)  # Új méret (szélesség, magasság)
-# Új turtle sprite ciklusok
-turtle_left_cycle = cycle([turtle_left, turtle_left1, turtle_left2])
-turtle_right_cycle = cycle([turtle_right, turtle_right1, turtle_right2])
-
-
-current_turtle_right = next(turtle_right_cycle)
-current_turtle_left = next(turtle_left_cycle)
+turtle = pygame.transform.scale(turtle, turtle_size)
+turtle1 = pygame.transform.scale(turtle1, turtle_size)
+turtle2 = pygame.transform.scale(turtle2, turtle_size)
 
 # Animáció beállítások
 frame_duration = 0.2  # Egy képkocka időtartama másodpercben
@@ -210,51 +173,6 @@ def start_game():
     start_time = time.time()
     play_next_track()
 
-def create_turtle():
-    direction = random.choice(["left", "right"])
-    y = initial_y  # A teknős függőleges pozíciója a karakter függőleges pozíciója alatt
-    if direction == "left":
-        x = width  # Kezdési helyzet a jobb oldalon
-    else:
-        x = -turtle_size[0]  # Kezdési helyzet a bal oldalon
-    turtles.append({"x": x, "y": y, "direction": direction})
-
-# Tekős osztály definiálása
-class Turtle(pygame.sprite.Sprite):
-    def __init__(self):
-        super().__init__()
-        self.image = turtle_img
-        self.rect = self.image.get_rect()
-        self.rect.x = random.randint(800, 1600)
-        self.rect.y = height - 100  # Adjust based on your game design
-        self.speed = random.randint(3, 6)
-
-    def update(self):
-        self.rect.x -= self.speed
-        if self.rect.x < -self.rect.width:
-            self.rect.x = random.randint(800, 1600)
-
-class Player(pygame.sprite.Sprite):
-    def __init__(self):
-        super().__init__()
-        self.image = turtle_img
-        self.rect = self.image.get_rect()
-        self.rect.center = (width // 2, height // 2)
-
-turtle_img = pygame.image.load("sprite/turtle/turtle_left.png").convert_alpha()
-player = Player()
-all_sprites.add(player)
-
-
-
-
-def update(self):
-    # Változás: Mozgás irányának meghatározása a kiindulási hely alapján
-    if self.rect.x > 900:
-        self.rect.x -= self.speed
-    else:
-        self.rect.x += self.speed
-
 def show_ready_go():
     global start_sound  # Használjuk a globális start_sound változót
     screen.fill((0, 0, 0))
@@ -274,7 +192,6 @@ def show_ready_go():
 # Színek
 button_color = (70, 130, 180)
 text_color = (255, 255, 255)
-white = (255, 255, 255)
 
 # Animációs vezérlés
 idle_time = 2000  # Idő milliszekundumban, mielőtt az animáció elindul
@@ -286,8 +203,6 @@ move_image_change_time = 100  # 0.1 másodperc képenként a mozgáshoz
 idle_image_change_time = 500  # 0.5 másodperc képenként a várakozáshoz
 attack_image_change_time = 300  # 0.3 másodperc képenként a támadáshoz
 avoid_image_change_time = 200  # 0.2 másodperc képenként az elkerüléshez
-turtle_image_change_time = 300  # 0.3 másodperc képenként a mozgáshoz
-
 image_change_clock = pygame.time.get_ticks()
 
 # Képek ciklikus váltása
@@ -307,7 +222,6 @@ is_moving = False
 game_started = False  # Új változó a játék kezdésének követéséhez
 
 while running:
-    screen.fill(white)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
@@ -448,53 +362,17 @@ while running:
         # Mosquito mozgatása balra
         mosquito_x -= mosquito_speed
 
+        # Turtle mozgatása balra
+        turtle_x -= turtle_speed  # Turtle mozgása balra a saját sebességével
+
         # Ha a mosquito elhagyja a képernyőt balról, kezdjük újra jobbról
         if mosquito_x < -mosquito1.get_width():
             mosquito_x = width
 
-        # Egy teknős per oldal szabály
-        left_turtles = [turtle for turtle in turtles if turtle["direction"] == "left"]
-        right_turtles = [turtle for turtle in turtles if turtle["direction"] == "right"]
+        # Ha a turtle elhagyja a képernyőt balról, kezdjük újra jobbról
+        if turtle_x < -turtle.get_width():
+            turtle_x = width
 
-        # Új turtle hozzáadása, ha kevesebb mint 4 van a képernyőn és nincs több egy oldalon
-        if len(turtles) < 4:
-            # Új teknős hozzáadása, ha nincs egy oldalon sem
-            if len(left_turtles) < 1 and len(right_turtles) < 1:
-                create_turtle()
-
-        # Sprite-ok frissítése
-        all_sprites.update()
-
-
-        # Turtle mozgatása és törlése, ha elérik a képernyő szélét
-        for turtle in turtles:
-            if pygame.time.get_ticks() - image_change_clock >= turtle_image_change_time:
-                image_change_clock = pygame.time.get_ticks()
-                if turtle["direction"] == "left":
-                    current_turtle = next(turtle_left_cycle)
-                else:
-                    current_turtle = next(turtle_right_cycle)
-            turtle_rect = current_turtle.get_rect(topleft=(turtle["x"], turtle["y"]))
-            screen.blit(current_turtle, (turtle["x"], turtle["y"]))
-            # Turtle mozgatása
-            if turtle["direction"] == "left":
-                turtle["x"] -= turtle_speed
-            else:
-                turtle["x"] += turtle_speed
-
-
-        # Töröljük a teknősöket, ha elérik a képernyő szélét
-        turtles = [turtle for turtle in turtles if 0 <= turtle["x"] <= width]
-
-        # Karakter téglalapjának frissítése
-        character_rect = character.get_rect(topleft=(character_x, character_y))
-
-        # Ütközés ellenőrzése (turtle)
-        for turtle in turtles:
-            turtle_rect = current_turtle.get_rect(topleft=(turtle["x"], turtle["y"]))
-            if turtle_rect.colliderect(character_rect):
-                running = False  # Játék véget ér
-                break  # Kilépünk a ciklusból, hogy elkerüljük a többszörös ütközés kezelést
 
         # Animáció váltása
         current_time = time.time()
@@ -507,7 +385,16 @@ while running:
             screen.blit(mosquito1, (mosquito_x, mosquito_y))  # Első képkocka rajzolása
         else:
             screen.blit(mosquito2, (mosquito_x, mosquito_y))  # Második képkocka rajzolása
+
+        # Képernyő frissítése (Turtle)
+        if current_frame == 0:
+            screen.blit(turtle, (turtle_x, turtle_y))  # Első képkocka rajzolása
+        if current_frame == 0:
+            screen.blit(turtle1, (turtle_x, turtle_y))  # Második képkocka rajzolása
+        else:
+            screen.blit(turtle2, (turtle_x, turtle_y))  # Harmadik képkocka rajzolása
         pygame.display.update()
+
         
         # Ütközés ellenőrzése
         mosquito_rect = mosquito1.get_rect(topleft=(mosquito_x, mosquito_y))
@@ -534,6 +421,30 @@ while running:
 
             running = False
 
+        # Ütközés ellenőrzése (Turtle)
+        turtle_rect = turtle.get_rect(topleft=(turtle_x, turtle_y))
+        turtle_rect = current_character.get_rect(topleft=(turtle_x, turtle_y))
+
+        if turtle_rect.colliderect(character_rect):
+            # Animáció lejátszása ütközéskor
+            death_animation_images = [
+                pygame.image.load("sprite/character/dead/dead1.png").convert_alpha(),
+                pygame.image.load("sprite/character/dead/dead2.png").convert_alpha(),
+                pygame.image.load("sprite/character/dead/dead3.png").convert_alpha(),
+                pygame.image.load("sprite/character/dead/dead4.png").convert_alpha()
+            ]
+            character_size = (rect_width, rect_height)  # Karakter mérete
+            death_animation_images = [pygame.transform.scale(img, character_size) for img in death_animation_images]
+            
+            death_frame_duration = 0.2  # Minden képkocka időtartama másodpercben
+            for img in death_animation_images:
+                screen.fill((0, 0, 0))  # Fekete háttér rajzolása
+                current_character = img
+                screen.blit(current_character, (rect_x, rect_y))
+                pygame.display.update()
+                pygame.time.delay(int(death_frame_duration * 1000))  # Várakozás képkockánként
+
+            running = False
 
         # FPS korlátozása
         fps.clock.tick(75)
