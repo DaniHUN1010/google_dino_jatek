@@ -63,7 +63,7 @@ fps = FPS()
 # Karakter adatai
 rect_width, rect_height = 75, 85  # Sprite méret
 rect_x, rect_y = width // 2 - rect_width // 2, height - rect_height
-rect_speed = 5  # Vízszintes sebesség
+rect_speed = 4  # Vízszintes sebesség
 
 # Karakter képek betöltése és méretezése
 character_right = pygame.image.load("sprite/character/base_right.png").convert_alpha()
@@ -224,7 +224,8 @@ while running:
             idle_clock = pygame.time.get_ticks()
             is_idle = False
             is_moving = True
-            if keys[pygame.K_LEFT]:
+            if keys[pygame.K_LEFT] and rect_x > width // 2 - 300:
+                rect_x -= rect_speed
                 bg_x += rect_speed  # Háttér mozgása jobbra
                 mosquito_x += rect_speed  # Mosquito pozíciójának korrigálása
                 turtle_x += rect_speed  # Turtle pozíciójának korrigálása
@@ -232,7 +233,8 @@ while running:
                     image_change_clock = pygame.time.get_ticks()
                     current_character = next(move_left_cycle)
                 facing_right = False
-            elif keys[pygame.K_RIGHT]:
+            elif keys[pygame.K_RIGHT] and rect_x < width // 2 + 300 - rect_width:
+                rect_x += rect_speed
                 bg_x -= rect_speed  # Háttér mozgása balra
                 mosquito_x -= rect_speed  # Mosquito pozíciójának korrigálása
                 turtle_x -= rect_speed  # Turtle pozíciójának korrigálása
@@ -242,17 +244,9 @@ while running:
                 facing_right = True
             else:
                 is_moving = False
-                if facing_right:
-                    current_character = character_right
-                else:
-                    current_character = character_left
                 current_character = character_right if facing_right else character_left
         else:
             is_moving = False
-            if facing_right:
-                current_character = character_right
-            else:
-                current_character = character_left
             current_character = character_right if facing_right else character_left
 
         # Ugrás és esés kezelése
