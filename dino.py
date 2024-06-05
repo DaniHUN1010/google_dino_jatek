@@ -38,6 +38,22 @@ turtle_size = (80, 80)  # Új méret (szélesség, magasság)
 turtle = pygame.transform.scale(turtle, turtle_size)
 turtle1 = pygame.transform.scale(turtle1, turtle_size)
 turtle2 = pygame.transform.scale(turtle2, turtle_size)
+# TURTLE BALRA NÉZŐ SPRITEJA
+
+turtle_size = 50
+turtle_x_right = width
+turtle_y_right = 530
+turtle_speed_right = 3  # Csökkentett sebesség a könnyebb játék érdekében
+
+turtle_right = pygame.image.load("sprite/turtle/turtle_right.png")
+turtle_right1 = pygame.image.load("sprite/turtle/turtle_right1.png")
+turtle_right2 = pygame.image.load("sprite/turtle/turtle_right2.png")
+
+turtle_right = pygame.transform.scale(turtle_right, (80, 80))
+turtle_right1 = pygame.transform.scale(turtle_right1, (80, 80))
+turtle_right2 = pygame.transform.scale(turtle_right2, (80, 80))
+
+# TURTLE JOBBRA NÉZŐ SPRITEJA
 
 # Animáció beállítások
 frame_duration = 0.2  # Egy képkocka időtartama másodpercben
@@ -249,6 +265,7 @@ while running:
             is_moving = False
             current_character = character_right if facing_right else character_left
 
+
         # Ugrás és esés kezelése
         if is_jumping:
             rect_y -= jump_speed
@@ -284,6 +301,9 @@ while running:
         # Turtle mozgatása balra
         turtle_x -= turtle_speed  # Turtle mozgása balra a saját sebességével
 
+        # Turtle mozgatása jobbra
+        turtle_x_right += turtle_speed_right  # Turtle right mozgása jobbra a saját sebességével
+
         # Ha a mosquito elhagyja a képernyőt balról, kezdjük újra jobbról
         if mosquito_x < -mosquito1.get_width():
             mosquito_x = width
@@ -291,6 +311,10 @@ while running:
         # Ha a turtle elhagyja a képernyőt balról, kezdjük újra jobbról
         if turtle_x < -turtle.get_width():
             turtle_x = width
+
+        # Ha a turtle elhagyja a képernyőt jobbról, kezdjük újra balról
+        if turtle_x_right > width:
+            turtle_x_right = -turtle_right.get_width()
 
 
         # Animáció váltása
@@ -312,8 +336,15 @@ while running:
             screen.blit(turtle1, (turtle_x, turtle_y))  # Második képkocka rajzolása
         else:
             screen.blit(turtle2, (turtle_x, turtle_y))  # Harmadik képkocka rajzolása
-        pygame.display.update()
 
+        # Képernyő frissítése (Turtle-jobbra néző sprite)
+        if current_frame == 0:
+            screen.blit(turtle_right, (turtle_x_right, turtle_y_right))  # Első képkocka rajzolása
+        if current_frame == 0:
+            screen.blit(turtle_right1, (turtle_x_right, turtle_y_right))  # Második képkocka rajzolása
+        else:
+            screen.blit(turtle_right2, (turtle_x_right, turtle_y_right))  # Harmadik képkocka rajzolása
+        pygame.display.update()
         
         # Ütközés ellenőrzése
         mosquito_rect = mosquito1.get_rect(topleft=(mosquito_x, mosquito_y)).inflate(-10, -10)
@@ -345,6 +376,31 @@ while running:
         turtle_rect = current_character.get_rect(topleft=(turtle_x, turtle_y)).inflate(-30, -30)  # Csökkentett hitbox
 
         if turtle_rect.colliderect(character_rect):
+            # Animáció lejátszása ütközéskor
+            death_animation_images = [
+                pygame.image.load("sprite/character/dead/dead1.png").convert_alpha(),
+                pygame.image.load("sprite/character/dead/dead2.png").convert_alpha(),
+                pygame.image.load("sprite/character/dead/dead3.png").convert_alpha(),
+                pygame.image.load("sprite/character/dead/dead4.png").convert_alpha()
+            ]
+            character_size = (rect_width, rect_height)  # Karakter mérete
+            death_animation_images = [pygame.transform.scale(img, character_size) for img in death_animation_images]
+            
+            death_frame_duration = 0.2  # Minden képkocka időtartama másodpercben
+            for img in death_animation_images:
+                screen.fill((0, 0, 0))  # Fekete háttér rajzolása
+                current_character = img
+                screen.blit(current_character, (rect_x, rect_y))
+                pygame.display.update()
+                pygame.time.delay(int(death_frame_duration * 1000))  # Várakozás képkockánként
+
+            running = False
+
+        # Ütközés ellenőrzése (Turtle-jobbra néző spriteja)
+        turtle_rect_right = turtle_right.get_rect(topleft=(turtle_x_right, turtle_y_right)).inflate(-30, -30)  # Csökkentett hitbox
+
+
+        if turtle_rect_right.colliderect(character_rect):
             # Animáció lejátszása ütközéskor
             death_animation_images = [
                 pygame.image.load("sprite/character/dead/dead1.png").convert_alpha(),
