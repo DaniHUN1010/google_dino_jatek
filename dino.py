@@ -111,7 +111,7 @@ is_falling = False
 initial_y = rect_y
 jump_height = rect_height * 2  # Ugrási magasság
 jump_speed = rect_speed * 2.5  # Ugrási sebesség növelése a gyorsabb és magasabb ugráshoz
-fall_speed = jump_speed * 0.8  # Esési sebesség egy kicsit kisebb, hogy simább legyen az esés
+fall_speed = jump_speed * 1  # Esési sebesség egy kicsit kisebb, hogy simább legyen az esés
 max_jump_height = initial_y - jump_height
 
 # Időszámláló
@@ -122,6 +122,9 @@ font = pygame.font.Font(None, 36)
 
 # Játék kezdőképernyője
 show_start_message = True
+
+# Pontszám változó
+score = -1
 
 # Ready és Go képek betöltése
 ready_image = pygame.image.load("kepek/ready.png").convert_alpha()
@@ -143,6 +146,7 @@ hetedik_track = pygame.mixer.Sound("zenek/hetedik_track.mp3")
 nyolcadik_track = pygame.mixer.Sound("zenek/nyolcadik_track.mp3")
 kilencedik_track = pygame.mixer.Sound("zenek/kilencedik_track.wav")
 tizedik_track = pygame.mixer.Sound("zenek/tizedik_track.wav")
+ten_points_sound = pygame.mixer.Sound("zenek/10points.mp3")
 
 # Trackek betöltése
 tracks = [elso_track, masodik_track, harmadik_track, negyedik_track, otodik_track, hatodik_track, hetedik_track, nyolcadik_track, kilencedik_track, tizedik_track]
@@ -295,6 +299,10 @@ while running:
         time_text = font.render(f"Idő: {elapsed_time}", True, (255, 255, 255))
         screen.blit(time_text, (10, 10))
 
+        # Pontszám kirajzolása
+        score_text = font.render(f"Pontszámod: {score}", True, (255, 255, 255))
+        screen.blit(score_text, (width // 2 - score_text.get_width() // 2, 10))
+
         # Mosquito mozgatása balra
         mosquito_x -= mosquito_speed
 
@@ -311,11 +319,16 @@ while running:
         # Ha a turtle elhagyja a képernyőt balról, kezdjük újra jobbról
         if turtle_x < -turtle.get_width():
             turtle_x = width
+            score += 1  # Pontszám növelése
+            if score % 10 == 0 and score != 0:  # Minden 10. kikerült turtle után játssza be a zenét
+                ten_points_sound.play()
 
         # Ha a turtle elhagyja a képernyőt jobbról, kezdjük újra balról
         if turtle_x_right > width:
             turtle_x_right = -turtle_right.get_width()
-
+            score += 1  # Pontszám növelése
+            if score % 10 == 0 and score != 0:  # Minden 10. kikerült turtle után játssza be a zenét
+                ten_points_sound.play()
 
         # Animáció váltása
         current_time = time.time()
