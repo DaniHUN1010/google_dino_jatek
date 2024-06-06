@@ -116,6 +116,8 @@ max_jump_height = initial_y - jump_height
 
 # Időszámláló
 start_time = time.time()
+pause_start_time = None
+total_pause_time = 0
 
 # Betűtípus
 font = pygame.font.Font(None, 36)
@@ -206,6 +208,9 @@ running = True
 facing_right = True  # Jelenlegi nézési irány
 is_moving = False
 game_started = False  # Új változó a játék kezdésének követéséhez
+# Játék megállítás változó
+game_paused = False
+
 
 while running:
     for event in pygame.event.get():
@@ -218,7 +223,28 @@ while running:
                 start_game()
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
-                running = False
+                game_paused = not game_paused
+                if game_paused:  # Ha a játék megállítva
+                    pause_start_time = time.time()
+                    # Zene szüneteltetése
+                    pygame.mixer.music.pause()
+                    for track in tracks:
+                        track.stop()
+                    # Fekete háttér
+                    screen.fill((0, 0, 0))
+                    # "A játék megállítva" szöveg kirajzolása
+                    pause_text = font.render("A játék megállítva", True, (255, 255, 255))
+                    text_rect = pause_text.get_rect(center=(width // 2, height // 2))
+                    screen.blit(pause_text, text_rect)
+                    pygame.display.update()
+                else:
+                    total_pause_time = time.time() - pause_start_time
+                    start_time += total_pause_time
+                    # Zene újraindítása
+                    pygame.mixer.music.unpause()
+                    if current_track_index < len(tracks):
+                        tracks[current_track_index - 1].play()
+
             elif event.key == pygame.K_SPACE and not is_jumping and not is_falling:  # Csak a space gombra ugrik
                 is_jumping = True
                 jump_start_y = rect_y  # Az ugrás kezdő y pozíciójának mentése
@@ -235,8 +261,17 @@ while running:
         pygame.display.update()
         continue  # A ciklus újrakezdése
     else:
+        if game_paused:  # Ha a játék megállítva
+            # Időszámláló megállítása
+            continue  # A ciklus újrakezdése
+
+        if pause_start_time:
+            total_pause_time += time.time() - pause_start_time
+            pause_start_time = None
+
         if next_track_time and time.time() >= next_track_time:
             play_next_track()
+
 
         # Billentyűzet bemenetek kezelése
         keys = pygame.key.get_pressed()
