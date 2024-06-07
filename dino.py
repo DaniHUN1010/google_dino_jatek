@@ -12,10 +12,12 @@ pygame.mixer.init()
 width, height = 800, 600
 screen = pygame.display.set_mode((width, height))
 pygame.display.set_caption("Dino Game")
+
+
 # Mosquito kezdő pozíciója és mérete
 mosquito_size = 50
 mosquito_x = width
-mosquito_y = 300
+mosquito_y = 295
 mosquito_speed = 6
 
 mosquito1 = pygame.image.load("sprite/mosquito/mosquito1.png")
@@ -53,7 +55,7 @@ turtle_right = pygame.transform.scale(turtle_right, (80, 80))
 turtle_right1 = pygame.transform.scale(turtle_right1, (80, 80))
 turtle_right2 = pygame.transform.scale(turtle_right2, (80, 80))
 
-# TURTLE JOBBRA NÉZŐ SPRITEJA
+# TURTLE JOBBRA NÉZŐ SPRITEJA      
 
 # Animáció beállítások
 frame_duration = 0.2  # Egy képkocka időtartama másodpercben
@@ -364,7 +366,14 @@ while running:
             score += 1  # Pontszám növelése
             if score % 10 == 0 and score != 0:  # Minden 10. kikerült turtle után játssza be a zenét
                 ten_points_sound.play()
-
+        
+        # Akadályok gyorsítása
+        next_threshold =10
+        if score == next_threshold:
+            mosquito_speed += 0.03
+            turtle_speed += 0.03
+            turtle_speed_right += 0.03
+            next_threshold += 10       
         # Animáció váltása
         current_time = time.time()
         if current_time - last_frame_change_time >= frame_duration:
