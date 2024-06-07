@@ -110,7 +110,7 @@ is_jumping = False
 is_falling = False
 initial_y = rect_y
 jump_height = rect_height * 2  # Ugrási magasság
-jump_speed = rect_speed * 2.5  # Ugrási sebesség növelése a gyorsabb és magasabb ugráshoz
+jump_speed = rect_speed * 2  # Ugrási sebesség növelése a gyorsabb és magasabb ugráshoz
 fall_speed = jump_speed * 0.8  # Esési sebesség egy kicsit kisebb, hogy simább legyen az esés
 max_jump_height = initial_y - jump_height
 
