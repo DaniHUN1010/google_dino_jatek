@@ -212,6 +212,8 @@ is_moving = False
 game_started = False  # Új változó a játék kezdésének követéséhez
 # Játék megállítás változó
 game_paused = False
+game_over = False  # Új változó a játék megállításához halál után
+animation_played = False
 
 
 while running:
@@ -370,9 +372,9 @@ while running:
         # Akadályok gyorsítása
         next_threshold =10
         if score == next_threshold:
-            mosquito_speed += 0.03
-            turtle_speed += 0.03
-            turtle_speed_right += 0.03
+            mosquito_speed += 0.3
+            turtle_speed += 0.2
+            turtle_speed_right += 0.1
             next_threshold += 10       
         # Animáció váltása
         current_time = time.time()
@@ -407,7 +409,7 @@ while running:
         mosquito_rect = mosquito1.get_rect(topleft=(mosquito_x, mosquito_y)).inflate(-10, -10)
         character_rect = current_character.get_rect(topleft=(rect_x, rect_y)).inflate(-10, -10)
 
-        if mosquito_rect.colliderect(character_rect):
+        if mosquito_rect.colliderect(character_rect) and not animation_played:
             # Animáció lejátszása ütközéskor
             death_animation_images = [
                 pygame.image.load("sprite/character/dead/dead1.png").convert_alpha(),
@@ -417,7 +419,7 @@ while running:
             ]
             character_size = (rect_width, rect_height)  # Karakter mérete
             death_animation_images = [pygame.transform.scale(img, character_size) for img in death_animation_images]
-            
+
             death_frame_duration = 0.2  # Minden képkocka időtartama másodpercben
             for img in death_animation_images:
                 screen.fill((0, 0, 0))  # Fekete háttér rajzolása
@@ -426,13 +428,12 @@ while running:
                 pygame.display.update()
                 pygame.time.delay(int(death_frame_duration * 1000))  # Várakozás képkockánként
 
-            running = False
+            game_over = True
+            animation_played = True
 
         # Ütközés ellenőrzése (Turtle)
         turtle_rect = turtle.get_rect(topleft=(turtle_x, turtle_y)).inflate(-30, -30)  # Csökkentett hitbox
-        turtle_rect = current_character.get_rect(topleft=(turtle_x, turtle_y)).inflate(-30, -30)  # Csökkentett hitbox
-
-        if turtle_rect.colliderect(character_rect):
+        if turtle_rect.colliderect(character_rect) and not animation_played:
             # Animáció lejátszása ütközéskor
             death_animation_images = [
                 pygame.image.load("sprite/character/dead/dead1.png").convert_alpha(),
@@ -442,7 +443,7 @@ while running:
             ]
             character_size = (rect_width, rect_height)  # Karakter mérete
             death_animation_images = [pygame.transform.scale(img, character_size) for img in death_animation_images]
-            
+
             death_frame_duration = 0.2  # Minden képkocka időtartama másodpercben
             for img in death_animation_images:
                 screen.fill((0, 0, 0))  # Fekete háttér rajzolása
@@ -451,13 +452,12 @@ while running:
                 pygame.display.update()
                 pygame.time.delay(int(death_frame_duration * 1000))  # Várakozás képkockánként
 
-            running = False
+            game_over = True
+            animation_played = True
 
         # Ütközés ellenőrzése (Turtle-jobbra néző spriteja)
         turtle_rect_right = turtle_right.get_rect(topleft=(turtle_x_right, turtle_y_right)).inflate(-30, -30)  # Csökkentett hitbox
-
-
-        if turtle_rect_right.colliderect(character_rect):
+        if turtle_rect_right.colliderect(character_rect) and not animation_played:
             # Animáció lejátszása ütközéskor
             death_animation_images = [
                 pygame.image.load("sprite/character/dead/dead1.png").convert_alpha(),
@@ -467,7 +467,7 @@ while running:
             ]
             character_size = (rect_width, rect_height)  # Karakter mérete
             death_animation_images = [pygame.transform.scale(img, character_size) for img in death_animation_images]
-            
+
             death_frame_duration = 0.2  # Minden képkocka időtartama másodpercben
             for img in death_animation_images:
                 screen.fill((0, 0, 0))  # Fekete háttér rajzolása
@@ -476,10 +476,23 @@ while running:
                 pygame.display.update()
                 pygame.time.delay(int(death_frame_duration * 1000))  # Várakozás képkockánként
 
-            running = False
+            game_over = True
+            animation_played = True
 
         # FPS korlátozása
         fps.clock.tick(75)
+
+# Halál utáni szöveg és zene
+if game_over and not animation_played:
+    halal = pygame.mixer.Sound("zenek/halal.ogg")
+    halal.play()
+    dead_text = font.render("Játék vége!", True, (255, 255, 255))
+    text_rect = dead_text.get_rect(center=(width // 2, height // 2))
+    screen.blit(dead_text, text_rect)
+    pygame.display.update()
+    pygame.time.delay(3000)  # Várakozás 3 másodpercig
+    animation_played = True  # Az állapotjelző frissítése
+    running = False  # Játékmenet megállítása
 
 # Pygame kilépése
 pygame.quit()
