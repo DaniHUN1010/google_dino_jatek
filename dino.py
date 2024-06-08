@@ -284,6 +284,8 @@ while running:
             elif event.key == pygame.K_UP and not is_jumping and not is_falling:  # Csak a felfelé nyílra ugrik
                 is_jumping = True
                 jump_start_y = rect_y  # Az ugrás kezdő y pozíciójának mentése
+            elif event.key == pygame.K_DOWN and (is_jumping or is_falling):  # Lefele nyíl gyorsabb eséshez
+                fall_speed *= 1.5  # Növeljük az esési sebességet ideiglenesen
 
         elif event.type == pygame.USEREVENT and game_over:
             # 1 másodperc után esemény kezelése
@@ -371,15 +373,23 @@ while running:
 
         # Ugrás és esés kezelése
         if is_jumping:
-            rect_y -= jump_speed
+            if keys[pygame.K_DOWN]:
+                rect_y -= fall_speed * 1.5  # Gyorsított esés lefele nyíl lenyomásával
+            else:
+                rect_y -= fall_speed
             if rect_y <= max_jump_height:
                 is_jumping = False
                 is_falling = True
+
         if is_falling:
-            rect_y += fall_speed
+            if keys[pygame.K_DOWN]:
+                rect_y += fall_speed * 1.5  # Gyorsított esés lefele nyíl lenyomásával
+            else:
+                rect_y += fall_speed
             if rect_y >= initial_y:
                 is_falling = False
                 rect_y = initial_y
+                fall_speed = jump_speed * 0.8  # Visszaállítjuk az eredeti esési sebességet
 
         # Háttér mozgatása és ismétlése
         bg_x = bg_x % width  # A háttérkép folyamatos ismétlődésének biztosítása
