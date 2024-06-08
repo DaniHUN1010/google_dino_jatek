@@ -262,18 +262,26 @@ while running:
         elif event.type == pygame.USEREVENT and game_over:
             # 1 másodperc után esemény kezelése
             screen.fill((0, 0, 0))
+            score_text = font.render(f"Pontszámod: {score}", True, (255, 255, 255))
+            screen.blit(score_text, (width // 2 - score_text.get_width() // 2, height // 2 - 40))
             dead_text = font.render("Játék vége!", True, (255, 255, 255))
             text_rect = dead_text.get_rect(center=(width // 2, height // 2))
             screen.blit(dead_text, text_rect)
+            exit_text = font.render("Kilépés: Esc", True, (255, 255, 255))
+            screen.blit(exit_text, (10, height - 30))
             pygame.display.update()
             pygame.time.set_timer(pygame.USEREVENT, 0)  # Timer kikapcsolása
 
 
     if game_over:
         screen.fill((0, 0, 0))
+        score_text = font.render(f"Pontszámod: {score}", True, (255, 255, 255))
+        screen.blit(score_text, (width // 2 - score_text.get_width() // 2, height // 2 - 40))
         dead_text = font.render("Játék vége!", True, (255, 255, 255))
         text_rect = dead_text.get_rect(center=(width // 2, height // 2))
         screen.blit(dead_text, text_rect)
+        exit_text = font.render("Kilépés: Esc", True, (255, 255, 255))
+        screen.blit(exit_text, (10, height - 30))
         pygame.display.update()
         continue  # Ne folytassuk a játék logikát, ha a játék vége
 
@@ -455,7 +463,7 @@ while running:
             for track in tracks:
                 track.stop()  # Állítsuk meg az összes zenét
             halal = pygame.mixer.Sound("zenek/halal.ogg")
-            halal.play()
+            halal.play(10)
             pygame.time.set_timer(pygame.USEREVENT, 1000)  # 1 másodperc után eseményt generál
 
         # Ütközés ellenőrzése (Turtle)
@@ -484,7 +492,7 @@ while running:
             for track in tracks:
                 track.stop()  # Állítsuk meg az összes zenét
             halal = pygame.mixer.Sound("zenek/halal.ogg")
-            halal.play()
+            halal.play(10)
             pygame.time.set_timer(pygame.USEREVENT, 1000)  # 1 másodperc után eseményt generál
 
         # Ütközés ellenőrzése (Turtle-jobbra néző spriteja)
@@ -513,7 +521,7 @@ while running:
             for track in tracks:
                 track.stop()  # Állítsuk meg az összes zenét
             halal = pygame.mixer.Sound("zenek/halal.ogg")
-            halal.play()
+            halal.play(10)
             pygame.time.set_timer(pygame.USEREVENT, 1000)  # 1 másodperc után eseményt generál
 
         # FPS korlátozása
