@@ -151,6 +151,7 @@ nyolcadik_track = pygame.mixer.Sound("zenek/nyolcadik_track.mp3")
 kilencedik_track = pygame.mixer.Sound("zenek/kilencedik_track.wav")
 tizedik_track = pygame.mixer.Sound("zenek/tizedik_track.wav")
 ten_points_sound = pygame.mixer.Sound("zenek/10points.mp3")
+halal = pygame.mixer.Sound("zenek/halal.ogg")
 
 # Trackek betöltése
 tracks = [elso_track, masodik_track, harmadik_track, negyedik_track, otodik_track, hatodik_track, hetedik_track, nyolcadik_track, kilencedik_track, tizedik_track]
@@ -182,6 +183,29 @@ def show_ready_go():
     screen.blit(go_image, (width // 2 - go_image.get_width() // 2, height // 2 - go_image.get_height() // 2))
     pygame.display.update()
     time.sleep(1)  # 1 másodperc várakozás
+
+def reset_game():
+    global mosquito_x, turtle_x, turtle_x_right, rect_x, rect_y, is_jumping, is_falling, game_over, game_started, animation_played, start_time, score, current_track_index, halal
+    mosquito_x = width
+    turtle_x = width
+    turtle_x_right = width
+    rect_x = width // 2 - rect_width // 2
+    rect_y = height - rect_height
+    is_jumping = False
+    is_falling = False
+    game_over = False
+    game_started = True
+    animation_played = False
+    start_time = time.time()
+    score = -1
+    current_track_index = 0
+    # Állítsuk meg az összes zenét
+    pygame.mixer.music.stop()
+    for track in tracks:
+        track.stop()
+    # Halál zene megállítása
+    halal.stop()
+    play_next_track()
 
 # Színek
 button_color = (70, 130, 180)
@@ -225,6 +249,8 @@ while running:
                 game_started = True
                 show_ready_go()
                 start_game()
+            elif game_over:  # Ha a játék vége van, újraindítás
+                reset_game()
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 if game_over:  # Ha a játék vége, kilépés
@@ -269,6 +295,8 @@ while running:
             screen.blit(dead_text, text_rect)
             exit_text = font.render("Kilépés: Esc", True, (255, 255, 255))
             screen.blit(exit_text, (10, height - 30))
+            restart_text = font.render("Újraindítás: Enter", True, (255, 255, 255))
+            screen.blit(restart_text, (width - restart_text.get_width() - 10, height - 30))
             pygame.display.update()
             pygame.time.set_timer(pygame.USEREVENT, 0)  # Timer kikapcsolása
 
@@ -282,6 +310,8 @@ while running:
         screen.blit(dead_text, text_rect)
         exit_text = font.render("Kilépés: Esc", True, (255, 255, 255))
         screen.blit(exit_text, (10, height - 30))
+        restart_text = font.render("Újraindítás: Enter", True, (255, 255, 255))
+        screen.blit(restart_text, (width - restart_text.get_width() - 10, height - 30))
         pygame.display.update()
         continue  # Ne folytassuk a játék logikát, ha a játék vége
 
