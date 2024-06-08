@@ -18,7 +18,7 @@ pygame.display.set_caption("Dino Game")
 mosquito_size = 50
 mosquito_x = width
 mosquito_y = 295
-mosquito_speed = 6
+mosquito_speed = 3.5
 
 mosquito1 = pygame.image.load("sprite/mosquito/mosquito1.png")
 mosquito2 = pygame.image.load("sprite/mosquito/mosquito2.png")
@@ -30,7 +30,7 @@ mosquito2 = pygame.transform.scale(mosquito2, mosquito_size)
 turtle_size = 50
 turtle_x = width
 turtle_y = 530
-turtle_speed = 3  # Csökkentett sebesség a könnyebb játék érdekében
+turtle_speed = 2.4  # Csökkentett sebesség a könnyebb játék érdekében
 
 turtle = pygame.image.load("sprite/turtle/turtle_left.png")
 turtle1 = pygame.image.load("sprite/turtle/turtle_left1.png")
@@ -45,7 +45,7 @@ turtle2 = pygame.transform.scale(turtle2, turtle_size)
 turtle_size = 50
 turtle_x_right = width
 turtle_y_right = 530
-turtle_speed_right = 3  # Csökkentett sebesség a könnyebb játék érdekében
+turtle_speed_right = 2.1  # Csökkentett sebesség a könnyebb játék érdekében
 
 turtle_right = pygame.image.load("sprite/turtle/turtle_right.png")
 turtle_right1 = pygame.image.load("sprite/turtle/turtle_right1.png")
@@ -400,11 +400,11 @@ while running:
                 ten_points_sound.play()
         
         # Akadályok gyorsítása
-        next_threshold =10
+        next_threshold = 10
         if score == next_threshold:
-            mosquito_speed += 0.3
-            turtle_speed += 0.2
-            turtle_speed_right += 0.1
+            mosquito_speed += 0.003
+            turtle_speed += 0.005
+            turtle_speed_right += 0.003
             next_threshold += 10       
         # Animáció váltása
         current_time = time.time()
@@ -436,8 +436,8 @@ while running:
         pygame.display.update()
         
         # Ütközés ellenőrzése
-        mosquito_rect = mosquito1.get_rect(topleft=(mosquito_x, mosquito_y)).inflate(-10, -10)
-        character_rect = current_character.get_rect(topleft=(rect_x, rect_y)).inflate(-10, -10)
+        mosquito_rect = mosquito1.get_rect(topleft=(mosquito_x, mosquito_y)).inflate(-20, -20)
+        character_rect = current_character.get_rect(topleft=(rect_x, rect_y)).inflate(-15, -15)
 
         if mosquito_rect.colliderect(character_rect) and not animation_played:
             # Animáció lejátszása ütközéskor
