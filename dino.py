@@ -436,8 +436,8 @@ while running:
         pygame.display.update()
         
         # Ütközés ellenőrzése
-        mosquito_rect = mosquito1.get_rect(topleft=(mosquito_x, mosquito_y)).inflate(-20, -20)
-        character_rect = current_character.get_rect(topleft=(rect_x, rect_y)).inflate(-15, -15)
+        mosquito_rect = mosquito1.get_rect(topleft=(mosquito_x, mosquito_y)).inflate(-30, -30)
+        character_rect = current_character.get_rect(topleft=(rect_x, rect_y)).inflate(-20, -20)
 
         if mosquito_rect.colliderect(character_rect) and not animation_played:
             # Animáció lejátszása ütközéskor
