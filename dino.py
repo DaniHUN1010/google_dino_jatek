@@ -227,27 +227,30 @@ while running:
                 start_game()
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
-                game_paused = not game_paused
-                if game_paused:  # Ha a játék megállítva
-                    pause_start_time = time.time()
-                    # Zene szüneteltetése
-                    pygame.mixer.music.pause()
-                    for track in tracks:
-                        track.stop()
-                    # Fekete háttér
-                    screen.fill((0, 0, 0))
-                    # "A játék megállítva" szöveg kirajzolása
-                    pause_text = font.render("A játék megállítva", True, (255, 255, 255))
-                    text_rect = pause_text.get_rect(center=(width // 2, height // 2))
-                    screen.blit(pause_text, text_rect)
-                    pygame.display.update()
+                if game_over:  # Ha a játék vége, kilépés
+                    running = False
                 else:
-                    total_pause_time = time.time() - pause_start_time
-                    start_time += total_pause_time
-                    # Zene újraindítása
-                    pygame.mixer.music.unpause()
-                    if current_track_index < len(tracks):
-                        tracks[current_track_index - 1].play()
+                    game_paused = not game_paused
+                    if game_paused:  # Ha a játék megállítva
+                        pause_start_time = time.time()
+                        # Zene szüneteltetése
+                        pygame.mixer.music.pause()
+                        for track in tracks:
+                            track.stop()
+                        # Fekete háttér
+                        screen.fill((0, 0, 0))
+                        # "A játék megállítva" szöveg kirajzolása
+                        pause_text = font.render("A játék megállítva", True, (255, 255, 255))
+                        text_rect = pause_text.get_rect(center=(width // 2, height // 2))
+                        screen.blit(pause_text, text_rect)
+                        pygame.display.update()
+                    else:
+                        total_pause_time = time.time() - pause_start_time
+                        start_time += total_pause_time
+                        # Zene újraindítása
+                        pygame.mixer.music.unpause()
+                        if current_track_index < len(tracks):
+                            tracks[current_track_index - 1].play()
 
             elif event.key == pygame.K_SPACE and not is_jumping and not is_falling:  # Csak a space gombra ugrik
                 is_jumping = True
@@ -255,6 +258,25 @@ while running:
             elif event.key == pygame.K_UP and not is_jumping and not is_falling:  # Csak a felfelé nyílra ugrik
                 is_jumping = True
                 jump_start_y = rect_y  # Az ugrás kezdő y pozíciójának mentése
+
+        elif event.type == pygame.USEREVENT and game_over:
+            # 1 másodperc után esemény kezelése
+            screen.fill((0, 0, 0))
+            dead_text = font.render("Játék vége!", True, (255, 255, 255))
+            text_rect = dead_text.get_rect(center=(width // 2, height // 2))
+            screen.blit(dead_text, text_rect)
+            pygame.display.update()
+            pygame.time.set_timer(pygame.USEREVENT, 0)  # Timer kikapcsolása
+
+
+    if game_over:
+        screen.fill((0, 0, 0))
+        dead_text = font.render("Játék vége!", True, (255, 255, 255))
+        text_rect = dead_text.get_rect(center=(width // 2, height // 2))
+        screen.blit(dead_text, text_rect)
+        pygame.display.update()
+        continue  # Ne folytassuk a játék logikát, ha a játék vége
+
     if not game_started:  # Ha a játék még nem kezdődött el
         # Háttérkép kirajzolása a képernyő közepére
         screen.blit(fox_hatter, ((width - BG.get_width()) // 2, (height - BG.get_height()) // 2))
@@ -430,6 +452,11 @@ while running:
 
             game_over = True
             animation_played = True
+            for track in tracks:
+                track.stop()  # Állítsuk meg az összes zenét
+            halal = pygame.mixer.Sound("zenek/halal.ogg")
+            halal.play()
+            pygame.time.set_timer(pygame.USEREVENT, 1000)  # 1 másodperc után eseményt generál
 
         # Ütközés ellenőrzése (Turtle)
         turtle_rect = turtle.get_rect(topleft=(turtle_x, turtle_y)).inflate(-30, -30)  # Csökkentett hitbox
@@ -454,6 +481,11 @@ while running:
 
             game_over = True
             animation_played = True
+            for track in tracks:
+                track.stop()  # Állítsuk meg az összes zenét
+            halal = pygame.mixer.Sound("zenek/halal.ogg")
+            halal.play()
+            pygame.time.set_timer(pygame.USEREVENT, 1000)  # 1 másodperc után eseményt generál
 
         # Ütközés ellenőrzése (Turtle-jobbra néző spriteja)
         turtle_rect_right = turtle_right.get_rect(topleft=(turtle_x_right, turtle_y_right)).inflate(-30, -30)  # Csökkentett hitbox
@@ -478,21 +510,15 @@ while running:
 
             game_over = True
             animation_played = True
+            for track in tracks:
+                track.stop()  # Állítsuk meg az összes zenét
+            halal = pygame.mixer.Sound("zenek/halal.ogg")
+            halal.play()
+            pygame.time.set_timer(pygame.USEREVENT, 1000)  # 1 másodperc után eseményt generál
 
         # FPS korlátozása
         fps.clock.tick(75)
 
-# Halál utáni szöveg és zene
-if game_over and not animation_played:
-    halal = pygame.mixer.Sound("zenek/halal.ogg")
-    halal.play()
-    dead_text = font.render("Játék vége!", True, (255, 255, 255))
-    text_rect = dead_text.get_rect(center=(width // 2, height // 2))
-    screen.blit(dead_text, text_rect)
-    pygame.display.update()
-    pygame.time.delay(3000)  # Várakozás 3 másodpercig
-    animation_played = True  # Az állapotjelző frissítése
-    running = False  # Játékmenet megállítása
 
 # Pygame kilépése
 pygame.quit()
