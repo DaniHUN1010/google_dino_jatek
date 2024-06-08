@@ -255,6 +255,8 @@ while running:
             if event.key == pygame.K_ESCAPE:
                 if game_over:  # Ha a játék vége, kilépés
                     running = False
+                elif game_started == False:
+                    running == False
                 else:
                     game_paused = not game_paused
                     if game_paused:  # Ha a játék megállítva
