@@ -219,8 +219,6 @@ is_idle = False
 # Képváltási időzítő
 move_image_change_time = 100  # 0.1 másodperc képenként a mozgáshoz
 idle_image_change_time = 500  # 0.5 másodperc képenként a várakozáshoz
-attack_image_change_time = 300  # 0.3 másodperc képenként a támadáshoz
-avoid_image_change_time = 200  # 0.2 másodperc képenként az elkerüléshez
 image_change_clock = pygame.time.get_ticks()
 
 # Képek ciklikus váltása
